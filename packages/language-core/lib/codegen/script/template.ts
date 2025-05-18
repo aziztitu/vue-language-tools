@@ -71,7 +71,26 @@ function* generateTemplateComponents(options: ScriptCodegenOptions): Generator<C
 		types.push(`typeof __VLS_componentsOption`);
 	}
 
+	// Detect locally imported components
+	const localImportedComponentNames = new Set<string>();
+	const bindings = options.scriptRanges?.bindings;
+	if (options.sfc.script && bindings) {
+		for (const { range, moduleName, isDefaultImport, isNamespace } of bindings) {
+			if (
+				moduleName
+				&& isDefaultImport
+				&& !isNamespace
+				&& options.vueCompilerOptions.extensions.some(ext => moduleName.endsWith(ext))
+			) {
+				localImportedComponentNames.add(options.sfc.script.content.slice(range.start, range.end));
+			}
+		}
+	}
+
 	types.push(`typeof __VLS_ctx`);
+	for (const localImportedComponent of localImportedComponentNames) {
+		types.push(`{${localImportedComponent}: typeof ${localImportedComponent}}`);
+	}
 
 	yield `type __VLS_LocalComponents =`;
 	for (const type of types) {

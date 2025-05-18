@@ -4,7 +4,7 @@ import { getNodeText, getStartEnd, parseBindingRanges } from './scriptSetupRange
 
 export interface ScriptRanges extends ReturnType<typeof parseScriptRanges> { }
 
-export function parseScriptRanges(ts: typeof import('typescript'), ast: ts.SourceFile, hasScriptSetup: boolean, withNode: boolean) {
+export function parseScriptRanges(ts: typeof import('typescript'), ast: ts.SourceFile, withNode: boolean) {
 
 	let exportDefault: (TextRange & {
 		expression: TextRange,
@@ -18,7 +18,7 @@ export function parseScriptRanges(ts: typeof import('typescript'), ast: ts.Sourc
 	}) | undefined;
 	let classBlockEnd: number | undefined;
 
-	const bindings = hasScriptSetup ? parseBindingRanges(ts, ast) : [];
+	const bindings = parseBindingRanges(ts, ast);
 
 	ts.forEachChild(ast, raw => {
 

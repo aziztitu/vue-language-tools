@@ -92,7 +92,7 @@ function createTsx(
 
 	const getScriptRanges = computed(() =>
 		sfc.script
-			? parseScriptRanges(ts, sfc.script.ast, !!sfc.scriptSetup, false)
+			? parseScriptRanges(ts, sfc.script.ast, false)
 			: undefined
 	);
 
