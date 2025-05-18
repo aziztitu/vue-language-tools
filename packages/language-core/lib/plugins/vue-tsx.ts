@@ -182,6 +182,26 @@ function createTsx(
 		return capitalize(camelize(baseName.slice(0, baseName.lastIndexOf('.'))));
 	});
 
+	const getLocalImportComponentNames = computedSet(
+		computed(() => {
+			const newNames = new Set<string>();
+			const bindings = getScriptRanges()?.bindings;
+			if (sfc.script && bindings) {
+				for (const { range, moduleName, isDefaultImport, isNamespace } of bindings) {
+					if (
+						moduleName
+						&& isDefaultImport
+						&& !isNamespace
+						&& ctx.vueCompilerOptions.extensions.some(ext => moduleName.endsWith(ext))
+					) {
+						newNames.add(sfc.script.content.slice(range.start, range.end));
+					}
+				}
+			}
+			return newNames;
+		})
+	);
+
 	const getGeneratedTemplate = computed(() => {
 		if (getResolvedOptions().skipTemplateCodegen || !sfc.template) {
 			return;
@@ -203,6 +223,7 @@ function createTsx(
 			propsAssignName: getSetupPropsAssignName(),
 			inheritAttrs: getSetupInheritAttrs(),
 			selfComponentName: getComponentSelfName(),
+			localImportedComponents: getLocalImportComponentNames(),
 		});
 
 		let current = codegen.next();

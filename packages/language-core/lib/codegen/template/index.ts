@@ -24,6 +24,7 @@ export interface TemplateCodegenOptions {
 	propsAssignName?: string;
 	inheritAttrs: boolean;
 	selfComponentName?: string;
+	localImportedComponents: Set<string>;
 }
 
 export function* generateTemplate(options: TemplateCodegenOptions): Generator<Code, TemplateCodegenContext> {
