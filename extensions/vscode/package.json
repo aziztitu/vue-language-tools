@@ -4,20 +4,20 @@
 	"version": "2.2.10",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/vuejs/language-tools.git",
+		"url": "https://github.com/aziztitu/vue-language-tools.git",
 		"directory": "packages/vscode"
 	},
 	"categories": [
 		"Programming Languages"
 	],
 	"sponsor": {
-		"url": "https://github.com/sponsors/johnsoncodehk"
+		"url": "https://github.com/sponsors/aziztitu"
 	},
 	"icon": "images/icon.png",
-	"displayName": "Vue - Official",
-	"description": "Language Support for Vue",
-	"author": "johnsoncodehk",
-	"publisher": "Vue",
+	"displayName": "Vue - XGenize",
+	"description": "Language Support for Vue by XGenize",
+	"author": "azee",
+	"publisher": "XGenize",
 	"engines": {
 		"vscode": "^1.88.0"
 	},
