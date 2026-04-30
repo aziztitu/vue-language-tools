@@ -1,6 +1,6 @@
 {
   "name": "@azee/vue-component-type-helpers",
-  "version": "2.3.0",
+  "version": "2.3.5",
   "license": "MIT",
   "files": [
     "**/*.js",
@@ -11,5 +11,6 @@
     "type": "git",
     "url": "https://github.com/vuejs/language-tools.git",
     "directory": "packages/component-type-helpers"
-  }
+  },
+  "gitHead": "75ae9af80121b1132e532ef543efab8d0b424a2e"
 }
