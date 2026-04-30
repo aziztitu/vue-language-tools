@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "volar",
-  "version": "2.3.6",
+  "version": "2.3.7",
   "repository": {
     "type": "git",
     "url": "https://github.com/aziztitu/vue-language-tools.git",
@@ -563,9 +563,9 @@
     "postinstall": "vscode-ext-gen --scope vue"
   },
   "devDependencies": {
-    "@azee/vue-language-core": "2.3.6",
-    "@azee/vue-language-server": "2.3.6",
-    "@azee/vue-typescript-plugin": "2.3.6",
+    "@azee/vue-language-core": "2.3.7",
+    "@azee/vue-language-server": "2.3.7",
+    "@azee/vue-typescript-plugin": "2.3.7",
     "@types/semver": "^7.5.3",
     "@types/vscode": "^1.82.0",
     "@volar/vscode": "2.4.11",
