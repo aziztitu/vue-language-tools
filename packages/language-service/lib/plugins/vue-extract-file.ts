@@ -1,6 +1,6 @@
 import type { CreateFile, LanguageServicePlugin, TextDocumentEdit, TextEdit } from '@volar/language-service';
 import type { ExpressionNode, TemplateChildNode } from '@vue/compiler-dom';
-import { type Sfc, tsCodegen } from '@vue/language-core';
+import { type Sfc, tsCodegen } from '@azee/vue-language-core';
 import type * as ts from 'typescript';
 import { URI } from 'vscode-uri';
 import { resolveEmbeddedCode } from '../utils';
@@ -15,7 +15,7 @@ const unicodeReg = /\\u/g;
 
 export function create(
 	ts: typeof import('typescript'),
-	{ collectExtractProps }: import('@vue/typescript-plugin/lib/requests').Requests,
+	{ collectExtractProps }: import('@azee/vue-typescript-plugin/lib/requests').Requests,
 ): LanguageServicePlugin {
 	return {
 		name: 'vue-extract-file',

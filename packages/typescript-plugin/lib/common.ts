@@ -1,4 +1,4 @@
-import { type Language, type VueCompilerOptions, VueVirtualCode } from '@vue/language-core';
+import { type Language, type VueCompilerOptions, VueVirtualCode } from '@azee/vue-language-core';
 import { capitalize, isGloballyAllowed } from '@vue/shared';
 import type * as ts from 'typescript';
 

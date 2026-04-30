@@ -24,7 +24,7 @@ export async function getLanguageServer(): Promise<{
 			[
 				'--disableAutomaticTypingAcquisition',
 				'--globalPlugins',
-				'@vue/typescript-plugin',
+				'@azee/vue-typescript-plugin',
 				'--suppressDiagnosticEvents',
 				// '--logVerbosity', 'verbose',
 				// '--logFile', path.join(__dirname, 'tsserver.log'),

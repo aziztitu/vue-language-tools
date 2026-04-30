@@ -5,7 +5,7 @@ const twoslashTemplateReg = /<!--\s*\^\?\s*-->/g;
 const twoslashScriptReg = /(?<=^|\n)\s*\/\/\s*\^\?/g;
 
 export function create(
-	{ getQuickInfoAtPosition }: import('@vue/typescript-plugin/lib/requests').Requests,
+	{ getQuickInfoAtPosition }: import('@azee/vue-typescript-plugin/lib/requests').Requests,
 ): LanguageServicePlugin {
 	return {
 		name: 'vue-twoslash-queries',

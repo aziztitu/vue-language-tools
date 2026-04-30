@@ -13,7 +13,7 @@
 
 ## 1.8.24 (2023/11/29)
 
-- refactor(component-type-helpers): vue 2 types now move to `vue-component-type-helpers/vue2` ([#3404](https://github.com/vuejs/language-tools/issues/3404))
+- refactor(component-type-helpers): vue 2 types now move to `@azee/vue-component-type-helpers/vue2` ([#3404](https://github.com/vuejs/language-tools/issues/3404))
 - feat(language-core): expose `defineEmits`'s `arg` and `typeArg` in `parseScriptSetupRanges` ([#3710](https://github.com/vuejs/language-tools/issues/3710)) - thanks @so1ve
 - fix(language-core): `strictTemplates` fails to report unknown components ([#3539](https://github.com/vuejs/language-tools/issues/3539))
 - fix(language-core): script syntax breaks if script options does not have trailing comma ([#3755](https://github.com/vuejs/language-tools/issues/3755))
@@ -128,7 +128,7 @@
 - feat(vscode): add `vue.server.path` setting for customize server module path
 - fix: correctly hyphen-case props ([#3424](https://github.com/vuejs/language-tools/issues/3424)) - thanks @so1ve
 - fix: generic components should respect `strictTemplates` ([#3487](https://github.com/vuejs/language-tools/issues/3487)) - thanks @so1ve
-- fix(vue-component-type-helpers): correctly handle generic components when using `ComponentExposed` ([#3536](https://github.com/vuejs/language-tools/issues/3536)) - thanks @so1ve
+- fix(@azee/vue-component-type-helpers): correctly handle generic components when using `ComponentExposed` ([#3536](https://github.com/vuejs/language-tools/issues/3536)) - thanks @so1ve
 
 ## 1.8.8 (2023/7/27)
 
@@ -357,7 +357,7 @@
 - fix: avoid props type-checking for `VNode` ([#2720](https://github.com/vuejs/language-tools/issues/2720))
 - fix: revert "fix: trim modifiers for slot name"
 - refactor: update extension settings from `volar.*` to `vue.*`
-- refactor(language-server): remove `petiteVue`, `vitePress` from server init options 
+- refactor(language-server): remove `petiteVue`, `vitePress` from server init options
   > for IDEs other than VSCode, use `additionalExtensions: ['html', 'md']` instead of
 
 **Breaking changes**
@@ -365,11 +365,10 @@
 - deprecated `vueCompilerOptions.jsxTemplates` ([#2677](https://github.com/vuejs/language-tools/issues/2677))
 - deprecated `vueCompilerOptions.nativeTags` ([#2685](https://github.com/vuejs/language-tools/issues/2685))
 
-
 ## 1.5.4 (2023/4/26) - pre-release
 
 - fix: `defineExpose` macro missing for Vue 3.3
-- fix(component-meta): meta info is empty if missing `vue-component-type-helpers` dependency
+- fix(component-meta): meta info is empty if missing `@azee/vue-component-type-helpers` dependency
 - fix: don't check time for codeActions when saving multiple files
 
 ## 1.5.3 (2023/4/26) - pre-release
@@ -482,8 +481,8 @@ For more details, see [#2620](https://github.com/vuejs/language-tools/issues/262
 
 ## 1.3.14 (2023/4/10) - pre-release
 
-- feat: add `vue-component-type-helpers` package ([#2590](https://github.com/vuejs/language-tools/issues/2590))
-- feat(component-meta): integrated `vue-component-type-helpers`
+- feat: add `@azee/vue-component-type-helpers` package ([#2590](https://github.com/vuejs/language-tools/issues/2590))
+- feat(component-meta): integrated `@azee/vue-component-type-helpers`
 - feat: upgrade to lerna-lite 2.0 ([#2597](https://github.com/vuejs/language-tools/issues/2597)) - thanks @ghiscoding
 - feat: support prop renaming for defineModel and defineProp
 - fix: template-based slots type incorrect ([#2590](https://github.com/vuejs/language-tools/issues/2590))
@@ -561,8 +560,8 @@ For more details, see [#2620](https://github.com/vuejs/language-tools/issues/262
 
 - feat: disable `missingRequiredProps`, `eventArgumentInInlineHandlers` by default
 - fix: `vueCompilerOptions` cannot extends from non-relative paths ([#2345](https://github.com/vuejs/language-tools/issues/2345)) - thanks @dschmidt
-- fix(vue-component-meta): `exposed` missing when use TS 5.0
-- perf(vue-component-meta): `props`, `events`, `slots`, `exposed` lazy calculation
+- fix(@azee/vue-component-meta): `exposed` missing when use TS 5.0
+- perf(@azee/vue-component-meta): `props`, `events`, `slots`, `exposed` lazy calculation
 - perf: provide change range of virtual file snapshot for typescript program
 
 ## 1.3.2 (2023/3/14) - pre-release
@@ -570,7 +569,7 @@ For more details, see [#2620](https://github.com/vuejs/language-tools/issues/262
 - feat(language-server): declare workspaceFolders support in server capabilities for IDEs (https://github.com/volarjs/volar.js/pull/18) - thanks @the-mikedavis
 - feat(vue-tsc): supports incremental emit (https://github.com/volarjs/volar.js/pull/17) - thanks @blake-newman
 - feat: allow code actions to run rename command after applying ([#2498](https://github.com/vuejs/language-tools/issues/2498)) (https://github.com/volarjs/plugins/pull/29) - thanks @zardoy
-- perf(vue-component-meta): faster initialization ([#2506](https://github.com/vuejs/language-tools/issues/2506)) - thanks @stafyniaksacha
+- perf(@azee/vue-component-meta): faster initialization ([#2506](https://github.com/vuejs/language-tools/issues/2506)) - thanks @stafyniaksacha
 - perf: search tsconfig on demand (https://github.com/volarjs/volar.js/pull/16)
 
 ## 1.3.0 (2023/3/10) - pre-release
@@ -594,7 +593,6 @@ For more details, see [#2620](https://github.com/vuejs/language-tools/issues/262
 - Upgrade required version of `@volar-plugins/*` to `>= 2.0.0`
   - After upgrade, you need to access `default` property with `require('@volar-plugins/xxx').default` in `volar.config.js`
 - Upgrade build target from ES2016 to ES2021 ([#2489](https://github.com/vuejs/language-tools/issues/2489))
-
 
 ## 1.2.0 (2023/2/25)
 
@@ -689,10 +687,10 @@ For more details, see [#2620](https://github.com/vuejs/language-tools/issues/262
 - Removed script setup convert tool
 - Unsupported tracing for vue-tsc ([#2378](https://github.com/vuejs/language-tools/issues/2378))
 - Extract Vite, Nuxt and component preview features to [Vue and Nuxt Preview](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.vscode-vue-preview)
-	- feat: support `vite-plugin-vue-component-preview` for nuxt 3.2
-	- feat: add `vue-preview.root` setting for Nuxt component preview
-	- fix: prevent random creation of multiple preview terminals
-	- fix: support nuxt preview without vite serving allow list ([#2287](https://github.com/vuejs/language-tools/issues/2287))
+  - feat: support `vite-plugin-vue-component-preview` for nuxt 3.2
+  - feat: add `vue-preview.root` setting for Nuxt component preview
+  - fix: prevent random creation of multiple preview terminals
+  - fix: support nuxt preview without vite serving allow list ([#2287](https://github.com/vuejs/language-tools/issues/2287))
 
 ## 1.0.24 (2023/1/8)
 
@@ -728,7 +726,7 @@ For more details, see [#2620](https://github.com/vuejs/language-tools/issues/262
 
 - feat: support browser navigation for embedded preview
 - feat: released pug extension ([#2274](https://github.com/vuejs/language-tools/issues/2274))
-- feat: add `volar.takeOverMode.extension` setting for choice extension that takeover *.ts language support
+- feat: add `volar.takeOverMode.extension` setting for choice extension that takeover \*.ts language support
 - fix(typescript-vue-plugin): can't always get latest status of .vue files ([#2271](https://github.com/vuejs/language-tools/issues/2271))
 - fix: multi-line template interpolation formatting indentation incorrect
 - refactor(framework): simplify `LanguageServerPlugin` api and dependency injection connection ([#2273](https://github.com/vuejs/language-tools/issues/2273))
@@ -740,7 +738,7 @@ For more details, see [#2620](https://github.com/vuejs/language-tools/issues/262
 - fix: TS `typescript/javascript.preferences.autoImportFileExcludePatterns` setting not working
 - fix: formatting not working for extra vue file extensions ([#2263](https://github.com/vuejs/language-tools/issues/2263))
 - fix(doctor): accidentally report `@vue/compiler-dom` warning ([#2262](https://github.com/vuejs/language-tools/issues/2262))
-- fix(vue-component-meta): `required` property incorrect ([#2256](https://github.com/vuejs/language-tools/issues/2256))
+- fix(@azee/vue-component-meta): `required` property incorrect ([#2256](https://github.com/vuejs/language-tools/issues/2256))
 - fix(preview): cannot start preview if project never start run vite server ([#2223](https://github.com/vuejs/language-tools/issues/2223))
 - fix: references codeLens not working
 
@@ -888,7 +886,6 @@ For more details, see [#2620](https://github.com/vuejs/language-tools/issues/262
 - fix: improve invalid content trimming in .md files for VitePress
 - fix: avoid language server throwing when changing built-in TS plugin activation
 
-
 ## 1.0.8 (2022/10/15)
 
 - feat: support for twoslash queries (https://github.com/volarjs/services/issues/9)
@@ -930,7 +927,7 @@ For more details, see [#2620](https://github.com/vuejs/language-tools/issues/262
 - feat: Support generic typed template slots for RFC 436 ([#1987](https://github.com/vuejs/language-tools/issues/1987))
 - feat: add `resolveTemplateCompilerOptions` API for `VueLanguagePlugin`
 - feat: support intellisense for `generic` attribute ([#1967](https://github.com/vuejs/language-tools/issues/1967))
-- feat: add `Show Component Meta` command for inspect `vue-component-meta` result
+- feat: add `Show Component Meta` command for inspect `@azee/vue-component-meta` result
 - feat: add `vueCompilerOptions.experimentalModelPropName` for customize `v-model` binding prop for vue 2 component ([#1969](https://github.com/vuejs/language-tools/issues/1969))
 - fix: `TypeScript Vue Plugin (Volar)` stop working
 - fix: change `vueCompilerOptions.dataAttributes` default value from `["data-*"]` to `[]` ([#1965](https://github.com/vuejs/language-tools/issues/1965))
@@ -986,7 +983,7 @@ For more details, see [#2620](https://github.com/vuejs/language-tools/issues/262
 
 - fix: html / css custom data not working (https://github.com/vuejs/language-tools/issues/707#issuecomment-1268513358)
 - fix: should not show tsconfig / name casing on status bar for md / html by default
-- fix: cannot watch *.ts changes without takeover mode (https://github.com/vuejs/language-tools/issues/1880#issuecomment-1269466716)
+- fix: cannot watch \*.ts changes without takeover mode (https://github.com/vuejs/language-tools/issues/1880#issuecomment-1269466716)
 
 ## 1.0.0-rc.3 (2022/10/5)
 
@@ -999,7 +996,7 @@ For more details, see [#2620](https://github.com/vuejs/language-tools/issues/262
 
 [[Download](https://github.com/vuejs/language-tools/issues/1880)]
 
-- feat(vue-component-meta): add file update apis for support HMR ([#1889](https://github.com/vuejs/language-tools/issues/1889))
+- feat(@azee/vue-component-meta): add file update apis for support HMR ([#1889](https://github.com/vuejs/language-tools/issues/1889))
 - feat: add `dataAttributes`, `htmlAttributes` options for vueCompilerOptions ([#1871](https://github.com/vuejs/language-tools/issues/1871))
 - feat: support for `typescript.autoImportFileExcludePatterns`
 
@@ -1135,6 +1132,7 @@ For more details, see [#2620](https://github.com/vuejs/language-tools/issues/262
 - No built-in support for pug template anymore, if you have use pug with vue-tsc before, please follow below changes:
 
 `package.json`
+
 ```
 {
 	"devDependencies": {
@@ -1145,6 +1143,7 @@ For more details, see [#2620](https://github.com/vuejs/language-tools/issues/262
 ```
 
 `tsconfig.json`
+
 ```
 {
 	"vueCompilerOptions": {

@@ -1,5 +1,5 @@
 import { runTsc } from '@volar/typescript/lib/quickstart/runTsc';
-import * as vue from '@vue/language-core';
+import * as vue from '@azee/vue-language-core';
 
 const windowsPathReg = /\\/g;
 

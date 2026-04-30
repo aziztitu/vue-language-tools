@@ -101,7 +101,7 @@ export = defineExtension(() => {
 		}
 
 		if (config.server.path && !serverPath) {
-			vscode.window.showErrorMessage('Cannot find @vue/language-server.');
+			vscode.window.showErrorMessage('Cannot find @azee/vue-language-server.');
 			return;
 		}
 
@@ -200,7 +200,7 @@ function resolveServerPath() {
 
 	if (path.isAbsolute(config.server.path)) {
 		const entryFile = require.resolve('./index.js', { paths: [config.server.path] });
-		const tsPluginPath = require.resolve('@vue/typescript-plugin', { paths: [path.dirname(entryFile)] });
+		const tsPluginPath = require.resolve('@azee/vue-typescript-plugin', { paths: [path.dirname(entryFile)] });
 		fs.writeFileSync(tsPluginPackPath, `module.exports = require("${tsPluginPath}");`);
 		return entryFile;
 	}
@@ -212,7 +212,7 @@ function resolveServerPath() {
 		try {
 			const serverPath = path.join(uri.fsPath, config.server.path);
 			const entryFile = require.resolve('./index.js', { paths: [serverPath] });
-			const tsPluginPath = require.resolve('@vue/typescript-plugin', { paths: [path.dirname(entryFile)] });
+			const tsPluginPath = require.resolve('@azee/vue-typescript-plugin', { paths: [path.dirname(entryFile)] });
 			fs.writeFileSync(tsPluginPackPath, `module.exports = require("${tsPluginPath}");`);
 			return entryFile;
 		}

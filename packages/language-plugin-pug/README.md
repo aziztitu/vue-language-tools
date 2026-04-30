@@ -1,17 +1,17 @@
-A `VueLanguagePlugin` to support `<template lang="pug">` for `@vue/language-server`.
+A `VueLanguagePlugin` to support `<template lang="pug">` for `@azee/vue-language-server`.
 
 ## Usage
 
 1. Install
 
-   `$ npm i -D @vue/language-plugin-pug`
+   `$ npm i -D @azee/vue-language-plugin-pug`
 
 2. Add to `tsconfig.json`
 
    ```jsonc
-	{
-		"vueCompilerOptions": {
-			"plugins": ["@vue/language-plugin-pug"]
-		}
-	}
+   {
+     "vueCompilerOptions": {
+       "plugins": ["@azee/vue-language-plugin-pug"]
+     }
+   }
    ```

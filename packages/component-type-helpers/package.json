@@ -1,5 +1,5 @@
 {
-	"name": "vue-component-type-helpers",
+	"name": "@azee/vue-component-type-helpers",
 	"version": "3.0.8",
 	"license": "MIT",
 	"files": [

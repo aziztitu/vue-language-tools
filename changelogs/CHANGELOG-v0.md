@@ -83,13 +83,13 @@
 - perf: incremental update SFC blocks without full parse SFC and mitigate memory leak
 - perf: incremental update html template interpolation without recompile template
 - perf: cache `ts.createSourceFile` for tsx code gen
-- fix(vue-component-meta): cannot create checker with TS 4.8.2
+- fix(@azee/vue-component-meta): cannot create checker with TS 4.8.2
 - fix: document features not working on Web IDE ([#1479](https://github.com/vuejs/language-tools/issues/1479))
 - fix: avoid auto complete triggers too aggressive in Sublime (https://github.com/sublimelsp/LSP-volar/issues/114)
 
 ## 0.40.2 (2022/8/28)
 
-- feat(vue-component-meta): add `createComponentMetaCheckerByJsonConfig` API to support create checker without tsconfig
+- feat(@azee/vue-component-meta): add `createComponentMetaCheckerByJsonConfig` API to support create checker without tsconfig
 - feat: move `highlight dom elements ☑` codeLens to status bar ([#1535](https://github.com/vuejs/language-tools/issues/1535))
 - feat: incremental update diagnostics cache range and avoid flicker ([#1718](https://github.com/vuejs/language-tools/issues/1718))
 - perf: incremental update TS script snapshot ([#1718](https://github.com/vuejs/language-tools/issues/1718))
@@ -129,9 +129,9 @@
 
 ## 0.39.5 (2022/8/6)
 
-- feat(vue-component-meta): add option to expose raw type ([#1674](https://github.com/vuejs/language-tools/issues/1674))
-- fix(vue-component-meta): recursive schema parsing ([#1660](https://github.com/vuejs/language-tools/issues/1660))
-- fix(vue-component-meta): parse defineProps in script setup with option ([#1665](https://github.com/vuejs/language-tools/issues/1665))
+- feat(@azee/vue-component-meta): add option to expose raw type ([#1674](https://github.com/vuejs/language-tools/issues/1674))
+- fix(@azee/vue-component-meta): recursive schema parsing ([#1660](https://github.com/vuejs/language-tools/issues/1660))
+- fix(@azee/vue-component-meta): parse defineProps in script setup with option ([#1665](https://github.com/vuejs/language-tools/issues/1665))
 - fix: SFC syntax broken in vscode v1.70.0 ([#1566](https://github.com/vuejs/language-tools/issues/1566)) ([#1675](https://github.com/vuejs/language-tools/issues/1675))
 - fix: vite app preview not working ([#1668](https://github.com/vuejs/language-tools/issues/1668))
 - fix: diagnosis is slow on windows after v0.39.2 ([#1663](https://github.com/vuejs/language-tools/issues/1663))
@@ -148,14 +148,14 @@
 
 ## 0.39.3 (2022/7/31)
 
-- feat(vue-component-meta): component schema improves ([#1656](https://github.com/vuejs/language-tools/issues/1656))
-- feat(vue-component-meta): support options api props default ([#1649](https://github.com/vuejs/language-tools/issues/1649))
+- feat(@azee/vue-component-meta): component schema improves ([#1656](https://github.com/vuejs/language-tools/issues/1656))
+- feat(@azee/vue-component-meta): support options api props default ([#1649](https://github.com/vuejs/language-tools/issues/1649))
 - feat: add "Volar: Reload Project" command ([#1605](https://github.com/vuejs/language-tools/issues/1605))
 - fix: vue-tsc watch not working ([#1647](https://github.com/vuejs/language-tools/issues/1647))
 
 ## 0.39.2 (2022/7/28)
 
-- feat: vue-component-meta ([#1627](https://github.com/vuejs/language-tools/issues/1627))
+- feat: @azee/vue-component-meta ([#1627](https://github.com/vuejs/language-tools/issues/1627))
 - feat: support for "JavaScript and TypeScript Nightly" ([#1332](https://github.com/vuejs/language-tools/issues/1332))
 - fix: tsx, jsx syntax break by vue directives syntax inject ([#1617](https://github.com/vuejs/language-tools/issues/1617))
 - fix: any type components missing in template when use script setup ([#1608](https://github.com/vuejs/language-tools/issues/1608))
@@ -212,7 +212,7 @@
 - fix: avoid duplicate class attribute in pug ([#1525](https://github.com/vuejs/language-tools/issues/1525))
 - fix: intellisense incorrect in new file ([#1548](https://github.com/vuejs/language-tools/issues/1548))
 - fix: `insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis` break v-for format ([#1398](https://github.com/vuejs/language-tools/issues/1398))
-- fix: document features not working in *.ts on takeover mode ([#1563](https://github.com/vuejs/language-tools/issues/1563))
+- fix: document features not working in \*.ts on takeover mode ([#1563](https://github.com/vuejs/language-tools/issues/1563))
 
 ## 0.38.6 (2022/7/16)
 
@@ -237,15 +237,15 @@
 
 - `experimentalSuppressUnknownJsxPropertyErrors`, `experimentalSuppressInvalidJsxElementTypeErrors` is replaced by `strictTemplates`.
 
-	```diff
-	{
-		"vueCompilerOptions": {
-	-		"experimentalSuppressUnknownJsxPropertyErrors": false,
-	-		"experimentalSuppressInvalidJsxElementTypeErrors": false,
-	+		"strictTemplates": true
-		},
-	}
-	```
+  ```diff
+  {
+  	"vueCompilerOptions": {
+  -		"experimentalSuppressUnknownJsxPropertyErrors": false,
+  -		"experimentalSuppressInvalidJsxElementTypeErrors": false,
+  +		"strictTemplates": true
+  	},
+  }
+  ```
 
 ## 0.38.3 (2022/7/7)
 
@@ -269,7 +269,7 @@
 ## 0.38.0 (2022/6/19)
 
 - feat: support component preview for Vite + Vue 3 ([#1476](https://github.com/vuejs/language-tools/issues/1476)) \
-you need to install [vite-plugin-vue-component-preview](https://github.com/johnsoncodehk/vite-plugin-vue-component-preview)  manually to support this feature
+  you need to install [vite-plugin-vue-component-preview](https://github.com/johnsoncodehk/vite-plugin-vue-component-preview) manually to support this feature
 - feat: support auto insert `.value` for vue 2 ([#1466](https://github.com/vuejs/language-tools/issues/1466))
 - fix: cannot define global components types with `@vue/runtime-core` in Vue 2 ([#1469](https://github.com/vuejs/language-tools/issues/1469))
 - fix: cannot emit declaration with script setup on vue-tsc ([#1459](https://github.com/vuejs/language-tools/issues/1459))
@@ -322,7 +322,7 @@ you need to install [vite-plugin-vue-component-preview](https://github.com/johns
 - feat: support find file references
 - feat: improve vitepress markdown parse reliability ([#1410](https://github.com/vuejs/language-tools/issues/1410))
 - feat: `vueCompilerOptions.experimentalSuppressInvalidJsxElementTypeErrors` default true ([#1405](https://github.com/vuejs/language-tools/issues/1405))
-- fix: fixed TS error with props beginning with data* ([#1413](https://github.com/vuejs/language-tools/issues/1413))
+- fix: fixed TS error with props beginning with data\* ([#1413](https://github.com/vuejs/language-tools/issues/1413))
 
 ## 0.37.2 (2022/6/7)
 
@@ -356,14 +356,14 @@ you need to install [vite-plugin-vue-component-preview](https://github.com/johns
 
 - `vueCompilerOptions.experimentalCompatMode` is renamed to `vueCompilerOptions.target`.
 
-	```diff
-	{
-		"vueCompilerOptions": {
-	-		"experimentalCompatMode": 2
-	+		"target": 2
-		},
-	}
-	```
+  ```diff
+  {
+  	"vueCompilerOptions": {
+  -		"experimentalCompatMode": 2
+  +		"target": 2
+  	},
+  }
+  ```
 
 ## 0.36.1 (2022/6/4)
 
@@ -386,7 +386,7 @@ you need to install [vite-plugin-vue-component-preview](https://github.com/johns
 
 **Breaking changes**
 
-- ~~feat: report error for unkonwn props ([#1077](https://github.com/vuejs/language-tools/issues/1077))~~ (Disabled by default in v0.36.1) 
+- ~~feat: report error for unkonwn props ([#1077](https://github.com/vuejs/language-tools/issues/1077))~~ (Disabled by default in v0.36.1)
 
 ## 0.35.2 (2022/5/30)
 
@@ -444,6 +444,7 @@ you need to install [vite-plugin-vue-component-preview](https://github.com/johns
 - fix: avoid tsconfig include `.vue` files outside rootDir with typescript plugin ([#1276](https://github.com/vuejs/language-tools/issues/1276))
 
 **Breaking changes**
+
 - Changed `vueCompilerOptions` property `experimentalShamefullySupportOptionsApi` to `experimentalImplicitWrapComponentOptionsWithDefineComponent` and disabled by default ([#1291](https://github.com/vuejs/language-tools/issues/1291))
 
 ## 0.34.12 (2022/5/10)
@@ -459,7 +460,7 @@ you need to install [vite-plugin-vue-component-preview](https://github.com/johns
 ## 0.34.11 (2022/4/29)
 
 - fix: cannnot trigger auto-complete in import statement by input space
-- fix: duplicate diagnostics in *.ts on takeover mode ([#1234](https://github.com/vuejs/language-tools/issues/1234))
+- fix: duplicate diagnostics in \*.ts on takeover mode ([#1234](https://github.com/vuejs/language-tools/issues/1234))
 - fix: style block has redundant html emmet result ([#1244](https://github.com/vuejs/language-tools/issues/1244))
 - fix: language server crash with low TS version ([#1242](https://github.com/vuejs/language-tools/issues/1242))
 - fix: directives type-check not working ([#1228](https://github.com/vuejs/language-tools/issues/1228))
@@ -506,6 +507,7 @@ you need to install [vite-plugin-vue-component-preview](https://github.com/johns
 - fix: false positive error with withDefaults + "strictNullChecks": false ([#1187](https://github.com/vuejs/language-tools/issues/1187))
 
 **Breaking changes**
+
 - sass formatter is moved to external plugin: https://github.com/volarjs/services/tree/master/packages/sass-formatter
 
 ## 0.34.6 (2022/4/12)
@@ -513,7 +515,7 @@ you need to install [vite-plugin-vue-component-preview](https://github.com/johns
 - feat: add prompt for `"jsx": "preserve"` missing
 - fix: auto-complete break language server if `"jsx": "preserve"` missing ([#1171](https://github.com/vuejs/language-tools/issues/1171))
 - fix: typescript plugin extension not working ([#1173](https://github.com/vuejs/language-tools/issues/1173))
-- fix: code action not working on *.ts with take over mode ([#1169](https://github.com/vuejs/language-tools/issues/1169))
+- fix: code action not working on \*.ts with take over mode ([#1169](https://github.com/vuejs/language-tools/issues/1169))
 - fix: object computed property name report false positive error in template ([#1176](https://github.com/vuejs/language-tools/issues/1176))
 - fix: should count variable uses with ref attribute ([#1168](https://github.com/vuejs/language-tools/issues/1168))
 
@@ -798,7 +800,7 @@ you need to install [vite-plugin-vue-component-preview](https://github.com/johns
 - fix: `Organize Imports` commmand not always working ([#798](https://github.com/vuejs/language-tools/issues/798))
 - fix: css variable injection virtual code cannot update ([#777](https://github.com/vuejs/language-tools/issues/777))
 - fix: should not initializes new language service when create a new file ([#802](https://github.com/vuejs/language-tools/issues/802))
-- fix: new file first diagnostics incorrect 
+- fix: new file first diagnostics incorrect
 
 **Breaking changes**
 
@@ -877,12 +879,12 @@ you need to install [vite-plugin-vue-component-preview](https://github.com/johns
 - fix: can't update diagnostics on windows + atom
 - fix: project finding logic incorrect with tsconfig `referencecs` option ([#649](https://github.com/vuejs/language-tools/issues/649))
 - fix: `{{ }}` colorized bracket pairs not working
-- fix: documentSymbol, foldingRanges not working to some *.ts files on take over mode
+- fix: documentSymbol, foldingRanges not working to some \*.ts files on take over mode
 
 **Breaking changes**
 
 - experimentalCompatMode behavior changed ([#576](https://github.com/vuejs/language-tools/issues/576))\
-do not force config `compatConfig: { Mode: 2 }` to template compiler with `"experimentalCompatMode": 2`
+  do not force config `compatConfig: { Mode: 2 }` to template compiler with `"experimentalCompatMode": 2`
 
 ## 0.28.10 (2021/10/28)
 
@@ -1007,7 +1009,7 @@ do not force config `compatConfig: { Mode: 2 }` to template compiler with `"expe
 
 ## 0.27.26 (2021/9/28)
 
-- fix: variables unused report can't update in *.ts in take over mode
+- fix: variables unused report can't update in \*.ts in take over mode
 - fix: when save file, next document changes diagnostics, semantic tokens incorrect
 
 ## 0.27.25 (2021/9/26)
@@ -1083,7 +1085,7 @@ do not force config `compatConfig: { Mode: 2 }` to template compiler with `"expe
 - feat: ts plugin status bar default hide
 - feat: improve accurate style variables support ([#463](https://github.com/vuejs/language-tools/issues/463))
 - fix: javascript format settings not working ([#466](https://github.com/vuejs/language-tools/issues/466))
-- fix: semantics token not working in *.ts ([#469](https://github.com/vuejs/language-tools/issues/469))
+- fix: semantics token not working in \*.ts ([#469](https://github.com/vuejs/language-tools/issues/469))
 - fix: fixed formatting result broken extreme case ([#470](https://github.com/vuejs/language-tools/issues/470))
 
 ## 0.27.16 (2021/9/7)
@@ -1121,7 +1123,7 @@ do not force config `compatConfig: { Mode: 2 }` to template compiler with `"expe
 - fix: can't not find template context properties if `<script>` block missing ([#437](https://github.com/vuejs/language-tools/issues/437))
 - fix: import completion incorrectly append `$1` ([#371](https://github.com/vuejs/language-tools/issues/371))
 - fix: completion should retrigger by space
-- fix: json types cannot update in *.vue on editing
+- fix: json types cannot update in \*.vue on editing
 
 ## 0.27.10 (2021/8/31)
 
@@ -1154,14 +1156,14 @@ do not force config `compatConfig: { Mode: 2 }` to template compiler with `"expe
 
 **Breaking changes**
 
-- remove tsPlugin required / unrequired prompt and `volar.tsPlugin` setting 
+- remove tsPlugin required / unrequired prompt and `volar.tsPlugin` setting
 
 ## 0.27.7 (2021/8/22)
 
 - feat: check vue-tsc version on start extension ([#381](https://github.com/vuejs/language-tools/issues/381))
 - feat: support for non-tsconfig project ([#349](https://github.com/vuejs/language-tools/issues/349))
 - fix: tsconfig priority should be higher than jsconfig ([#400](https://github.com/vuejs/language-tools/issues/400))
-- fix: fixed hover info broken in *.ts when TS plugin enabled
+- fix: fixed hover info broken in \*.ts when TS plugin enabled
 
 ## 0.27.6 (2021/8/21)
 
@@ -1337,7 +1339,6 @@ do not force config `compatConfig: { Mode: 2 }` to template compiler with `"expe
 - fix: handle SFC parse failed for component auto-import
 - fix: semanticTokens search range incorrect
 
-
 ## 0.26.2 (2021/7/16)
 
 - fix: fixed a few TS semanticTokens problems
@@ -1350,7 +1351,7 @@ do not force config `compatConfig: { Mode: 2 }` to template compiler with `"expe
 ## 0.26.1 (2021/7/15)
 
 - fix: fixed a few TS renaming, find referenecs problems
-- fix: first time *.vue file change can't effect *.ts diagnostics
+- fix: first time _.vue file change can't effect _.ts diagnostics
 
 ## 0.26.0 (2021/7/15)
 
@@ -2090,7 +2091,7 @@ See: https://github.com/vuejs/language-tools/discussions/134
 - feat: server init progress
 - feat: vue block completion
 - fix: tsconfig.json update not working
-- fix: __VLS_GlobalComponents not working if no `<script>` block
+- fix: \_\_VLS_GlobalComponents not working if no `<script>` block
 - fix: element tag mapping incorrect corner case
 
 ## 0.18.16 (2020/12/30)

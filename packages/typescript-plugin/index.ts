@@ -1,5 +1,5 @@
 import { createLanguageServicePlugin } from '@volar/typescript/lib/quickstart/createLanguageServicePlugin';
-import * as vue from '@vue/language-core';
+import * as vue from '@azee/vue-language-core';
 import type * as ts from 'typescript';
 import { createVueLanguageServiceProxy } from './lib/common';
 import type { Requests } from './lib/requests';

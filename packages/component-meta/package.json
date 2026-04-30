@@ -1,5 +1,5 @@
 {
-	"name": "vue-component-meta",
+	"name": "@azee/vue-component-meta",
 	"version": "3.0.8",
 	"license": "MIT",
 	"files": [
@@ -14,9 +14,9 @@
 	},
 	"dependencies": {
 		"@volar/typescript": "2.4.23",
-		"@vue/language-core": "3.0.8",
+		"@azee/vue-language-core": "3.0.8",
 		"path-browserify": "^1.0.1",
-		"vue-component-type-helpers": "3.0.8"
+		"@azee/vue-component-type-helpers": "3.0.8"
 	},
 	"peerDependencies": {
 		"typescript": "*"

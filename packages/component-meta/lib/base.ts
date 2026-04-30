@@ -1,5 +1,5 @@
 import { createLanguageServiceHost, resolveFileLanguageId, type TypeScriptProjectHost } from '@volar/typescript';
-import * as vue from '@vue/language-core';
+import * as vue from '@azee/vue-language-core';
 import { posix as path } from 'path-browserify';
 import type * as ts from 'typescript';
 
@@ -236,7 +236,7 @@ function baseCreate(
 
 	function getMetaScriptContent(fileName: string) {
 		let code = `
-import type { ComponentType, ComponentProps, ComponentEmit, ComponentSlots, ComponentExposed } from 'vue-component-meta/lib/helpers';
+import type { ComponentType, ComponentProps, ComponentEmit, ComponentSlots, ComponentExposed } from '@azee/vue-component-meta/lib/helpers';
 import type * as Components from '${fileName.slice(0, -'.meta.ts'.length)}';
 
 export default {} as { [K in keyof typeof Components]: ComponentMeta<typeof Components[K]>; };

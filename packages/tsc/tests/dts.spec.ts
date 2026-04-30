@@ -1,5 +1,5 @@
 import { proxyCreateProgram } from '@volar/typescript';
-import * as vue from '@vue/language-core';
+import * as vue from '@azee/vue-language-core';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as ts from 'typescript';

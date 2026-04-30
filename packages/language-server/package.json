@@ -1,5 +1,5 @@
 {
-	"name": "@vue/language-server",
+	"name": "@azee/vue-language-server",
 	"version": "3.0.8",
 	"license": "MIT",
 	"files": [
@@ -17,9 +17,9 @@
 	},
 	"dependencies": {
 		"@volar/language-server": "2.4.23",
-		"@vue/language-core": "3.0.8",
-		"@vue/language-service": "3.0.8",
-		"@vue/typescript-plugin": "3.0.8",
+		"@azee/vue-language-core": "3.0.8",
+		"@azee/vue-language-service": "3.0.8",
+		"@azee/vue-typescript-plugin": "3.0.8",
 		"vscode-uri": "^3.0.8"
 	},
 	"peerDependencies": {

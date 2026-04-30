@@ -1,4 +1,4 @@
-import type { getReactiveReferences } from '@vue/typescript-plugin/lib/requests/getReactiveReferences';
+import type { getReactiveReferences } from '@azee/vue-typescript-plugin/lib/requests/getReactiveReferences';
 import type * as ts from 'typescript';
 import * as vscode from 'vscode';
 import { config } from './config';

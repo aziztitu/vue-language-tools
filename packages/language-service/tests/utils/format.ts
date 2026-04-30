@@ -1,5 +1,5 @@
 import * as kit from '@volar/kit';
-import { createVueLanguagePlugin, getDefaultCompilerOptions } from '@vue/language-core';
+import { createVueLanguagePlugin, getDefaultCompilerOptions } from '@azee/vue-language-core';
 import * as ts from 'typescript';
 import { describe, expect, it } from 'vitest';
 import type { URI } from 'vscode-uri';

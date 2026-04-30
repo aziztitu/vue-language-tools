@@ -1,5 +1,5 @@
 import type { LanguageServicePlugin, TextDocument, VirtualCode } from '@volar/language-service';
-import { isRenameEnabled } from '@vue/language-core';
+import { isRenameEnabled } from '@azee/vue-language-core';
 import { create as baseCreate, type Provide } from 'volar-service-css';
 import type * as css from 'vscode-css-languageservice';
 import { resolveEmbeddedCode } from '../utils';

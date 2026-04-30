@@ -1,5 +1,5 @@
 import type { InlayHint, InlayHintKind, LanguageServicePlugin } from '@volar/language-service';
-import { collectBindingIdentifiers, tsCodegen } from '@vue/language-core';
+import { collectBindingIdentifiers, tsCodegen } from '@azee/vue-language-core';
 import type * as ts from 'typescript';
 import { resolveEmbeddedCode } from '../utils';
 

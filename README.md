@@ -13,50 +13,50 @@
 ## Packages
 
 - [Vue (Official)](https://github.com/vuejs/language-tools/tree/master/extensions/vscode) \
-*Vue, Vitepress, petite-vue language support extension for VSCode*
-- [vue-tsc](https://github.com/vuejs/language-tools/tree/master/packages/tsc) \
-*Type-check and dts build command line tool*
-- [vue-component-meta](https://github.com/vuejs/language-tools/tree/master/packages/component-meta) \
-*Component props, events, slots types information extract tool*
-- [`@vue/language-server`](/packages/language-server/) \
-*The language server itself*.
-- [`@vue/typescript-plugin`](/packages/typescript-plugin/) \
-*TypeScript LanguageService Plugin for Vue*.
+  _Vue, Vitepress, petite-vue language support extension for VSCode_
+- [@azee/vue-tsc](https://github.com/vuejs/language-tools/tree/master/packages/tsc) \
+  _Type-check and dts build command line tool_
+- [@azee/vue-component-meta](https://github.com/vuejs/language-tools/tree/master/packages/component-meta) \
+  _Component props, events, slots types information extract tool_
+- [`@azee/vue-language-server`](/packages/language-server/) \
+  _The language server itself_.
+- [`@azee/vue-typescript-plugin`](/packages/typescript-plugin/) \
+  _TypeScript LanguageService Plugin for Vue_.
 
 ## Community Integration
 
 [yaegassy/coc-volar](https://github.com/yaegassy/coc-volar) \
-*Vue language client for coc.nvim*
+_Vue language client for coc.nvim_
 
 [neovim/nvim-lspconfig](https://github.com/neovim/nvim-lspconfig) \
-*Vue language server configuration for Neovim*, check documentation [here](https://github.com/vuejs/language-tools/wiki/Neovim) to set it up.
+_Vue language server configuration for Neovim_, check documentation [here](https://github.com/vuejs/language-tools/wiki/Neovim) to set it up.
 
 [mattn/vim-lsp-settings](https://github.com/mattn/vim-lsp-settings) \
-*Vue language server auto configuration for vim-lsp*
+_Vue language server auto configuration for vim-lsp_
 
 [sublimelsp/LSP-volar](https://github.com/sublimelsp/LSP-volar) \
-*Vue language client for Sublime*
+_Vue language client for Sublime_
 
 [kabiaa/atom-ide-volar](https://github.com/kabiaa/atom-ide-volar) \
-*Vue language client for Atom*
+_Vue language client for Atom_
 
 [emacs-lsp/lsp-mode](https://github.com/emacs-lsp/lsp-mode) ([jadestrong/lsp-volar](https://github.com/jadestrong/lsp-volar)) \
-*Vue language client for Emacs*
+_Vue language client for Emacs_
 
 [tommasongr/nova-vue](https://github.com/tommasongr/nova-vue) \
-*Vue language client for Nova*
+_Vue language client for Nova_
 
 [xiaoxin-sky/lapce-vue](https://github.com/xiaoxin-sky/lapce-vue) \
-*Vue language client for Lapce*
+_Vue language client for Lapce_
 
 [Kingwl/monaco-volar](https://github.com/Kingwl/monaco-volar) \
-*Vue language support for Monaco on Browser*
+_Vue language support for Monaco on Browser_
 
 [WebStorm](https://www.jetbrains.com/webstorm/) \
-*Built-in integration for `@vue/language-server`*
+_Built-in integration for `@azee/vue-language-server`_
 
 [Eclipse WildWebDeveloper](https://github.com/eclipse-wildwebdeveloper/wildwebdeveloper) \
-*Vue language server configuration for Eclipse*
+_Vue language server configuration for Eclipse_
 
 <!-- Editor link: https://www.mermaidchart.com/app/projects/c62d8944-0e06-47f0-a8de-f89a7378490f/diagrams/91fd02c0-5c91-4f72-a8b4-7af21b7c4d86/version/v0.1/edit -->
 

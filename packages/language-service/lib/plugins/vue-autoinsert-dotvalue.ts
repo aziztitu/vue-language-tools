@@ -1,11 +1,11 @@
 import type { LanguageServicePlugin, TextDocument } from '@volar/language-service';
-import { hyphenateAttr } from '@vue/language-core';
+import { hyphenateAttr } from '@azee/vue-language-core';
 import type * as ts from 'typescript';
 import { resolveEmbeddedCode } from '../utils';
 
 export function create(
 	ts: typeof import('typescript'),
-	{ isRefAtPosition }: import('@vue/typescript-plugin/lib/requests').Requests,
+	{ isRefAtPosition }: import('@azee/vue-typescript-plugin/lib/requests').Requests,
 ): LanguageServicePlugin {
 	return {
 		name: 'vue-autoinsert-dotvalue',

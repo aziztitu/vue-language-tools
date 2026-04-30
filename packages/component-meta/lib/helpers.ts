@@ -1,1 +1,1 @@
-export type * from 'vue-component-type-helpers';
+export type * from '@azee/vue-component-type-helpers';

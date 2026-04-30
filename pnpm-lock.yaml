@@ -55,10 +55,10 @@ importers:
       '@vue/compiler-sfc':
         specifier: ^3.5.0
         version: 3.5.13
-      '@vue/language-server':
+      '@azee/vue-language-server':
         specifier: 3.0.8
         version: link:../../packages/language-server
-      '@vue/typescript-plugin':
+      '@azee/vue-typescript-plugin':
         specifier: 3.0.8
         version: link:../../packages/typescript-plugin
       reactive-vscode:
@@ -82,7 +82,7 @@ importers:
       '@volar/typescript':
         specifier: 2.4.23
         version: 2.4.23
-      '@vue/language-core':
+      '@azee/vue-language-core':
         specifier: 3.0.8
         version: link:../language-core
       path-browserify:
@@ -91,7 +91,7 @@ importers:
       typescript:
         specifier: '*'
         version: 5.9.2
-      vue-component-type-helpers:
+      @azee/vue-component-type-helpers:
         specifier: 3.0.8
         version: link:../component-type-helpers
     devDependencies:
@@ -165,7 +165,7 @@ importers:
       '@vue/compiler-dom':
         specifier: ^3.5.0
         version: 3.5.13
-      '@vue/language-core':
+      '@azee/vue-language-core':
         specifier: 3.0.8
         version: link:../language-core
 
@@ -174,13 +174,13 @@ importers:
       '@volar/language-server':
         specifier: 2.4.23
         version: 2.4.23
-      '@vue/language-core':
+      '@azee/vue-language-core':
         specifier: 3.0.8
         version: link:../language-core
-      '@vue/language-service':
+      '@azee/vue-language-service':
         specifier: 3.0.8
         version: link:../language-service
-      '@vue/typescript-plugin':
+      '@azee/vue-typescript-plugin':
         specifier: 3.0.8
         version: link:../typescript-plugin
       typescript:
@@ -202,7 +202,7 @@ importers:
       '@volar/language-service':
         specifier: 2.4.23
         version: 2.4.23
-      '@vue/language-core':
+      '@azee/vue-language-core':
         specifier: 3.0.8
         version: link:../language-core
       '@vue/shared':
@@ -254,7 +254,7 @@ importers:
       '@vue/compiler-dom':
         specifier: ^3.5.0
         version: 3.5.13
-      '@vue/typescript-plugin':
+      '@azee/vue-typescript-plugin':
         specifier: 3.0.8
         version: link:../typescript-plugin
       vscode-css-languageservice:
@@ -266,7 +266,7 @@ importers:
       '@volar/typescript':
         specifier: 2.4.23
         version: 2.4.23
-      '@vue/language-core':
+      '@azee/vue-language-core':
         specifier: 3.0.8
         version: link:../language-core
       typescript:
@@ -282,7 +282,7 @@ importers:
       '@volar/typescript':
         specifier: 2.4.23
         version: 2.4.23
-      '@vue/language-core':
+      '@azee/vue-language-core':
         specifier: 3.0.8
         version: link:../language-core
       '@vue/shared':
@@ -310,7 +310,7 @@ importers:
       vue:
         specifier: https://pkg.pr.new/vue@e1bc0eb02e22bc0c236e1471c11d96a368764b72
         version: https://pkg.pr.new/vue@e1bc0eb02e22bc0c236e1471c11d96a368764b72(typescript@5.9.2)
-      vue-component-meta:
+      @azee/vue-component-meta:
         specifier: 3.0.8
         version: link:../packages/component-meta
       vue3.4:

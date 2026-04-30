@@ -1,6 +1,6 @@
 import type { LanguageServiceContext, VirtualCode } from '@volar/language-service';
 import type { NodeTypes } from '@vue/compiler-dom';
-import { forEachElementNode, hyphenateTag, VueVirtualCode } from '@vue/language-core';
+import { forEachElementNode, hyphenateTag, VueVirtualCode } from '@azee/vue-language-core';
 import type { URI } from 'vscode-uri';
 
 export enum TagNameCasing {

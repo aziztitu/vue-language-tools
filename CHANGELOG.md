@@ -48,7 +48,7 @@
 - fix(language-core): wrap `:class` expression with parens - Thanks to @KazariEX!
 - fix(vscode): revert Vue 2 versions in `target` option (#5583) - Thanks to @gxres042!
 - fix(language-service): skip document highlight from tsserver within element tags (#5584) - Thanks to @KazariEX!
-- fix(component-meta): re-export `vue-component-type-helpers` to `lib/helpers` (#5600)
+- fix(component-meta): re-export `@azee/vue-component-type-helpers` to `lib/helpers` (#5600)
 - fix(language-core): remove the non-strict `configFileName` default value (#5606)
 - fix(language-core): don't look for input files during evaluation of vueCompilerOptions (#5598)
 - fix(vscode): Improved reliability of handling extension activation contention (#5588)
@@ -61,7 +61,7 @@
 - refactor(language-core): generate setup returns on demand - Thanks to @KazariEX!
 - chore(language-service): remove `exclude` config suggestion from global types error message (#5579) - Thanks to @Ciallo-Chiaki
 - chore(vscode): update extension display name "Vue.js" (#5582)
-- chore: update `vue-component-type-helpers` to current version (#5589) - Thanks to @kingyue737!
+- chore: update `@azee/vue-component-type-helpers` to current version (#5589) - Thanks to @kingyue737!
 
 ## 3.0.5 (2025-08-01)
 
@@ -132,7 +132,7 @@
 - fix(vscode): remove `colorizedBracketPairs` config for plaintext
 - fix(language-core): avoid early access to local types to skip unnecessary type generation - Thanks to @KazariEX!
 - fix(language-core): treat `<component>` without `is` prop as normal component - Thanks to @KazariEX!
-- fix(vscode): make sure tsserver loads `@vue/typescript-plugin` last (#5483)
+- fix(vscode): make sure tsserver loads `@azee/vue-typescript-plugin` last (#5483)
 - fix(language-core): only keep navigation code feature on static `name` value of `<slot>` - Thanks to @KazariEX!
 - fix(language-server): add `allowJs` to reactivity analyze host - Thanks to @KazariEX!
 - fix(language-core): do not set template lang to `md` for markdown (#5497) - Thanks to @KazariEX!

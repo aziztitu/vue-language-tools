@@ -1,5 +1,5 @@
 import type { LanguageServiceContext, SourceScript } from '@volar/language-service';
-import type { VueVirtualCode } from '@vue/language-core';
+import type { VueVirtualCode } from '@azee/vue-language-core';
 import { URI } from 'vscode-uri';
 
 export function resolveEmbeddedCode(

@@ -1,9 +1,9 @@
 import type { DocumentHighlightKind, LanguageServicePlugin } from '@volar/language-service';
-import { forEachElementNode, getElementTagOffsets } from '@vue/language-core';
+import { forEachElementNode, getElementTagOffsets } from '@azee/vue-language-core';
 import { resolveEmbeddedCode } from '../utils';
 
 export function create(
-	{ getDocumentHighlights }: import('@vue/typescript-plugin/lib/requests').Requests,
+	{ getDocumentHighlights }: import('@azee/vue-typescript-plugin/lib/requests').Requests,
 ): LanguageServicePlugin {
 	return {
 		name: 'vue-document-highlights',

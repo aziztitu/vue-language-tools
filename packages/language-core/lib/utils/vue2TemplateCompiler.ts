@@ -4,7 +4,7 @@ const Vue2TemplateCompiler: typeof import('@vue/compiler-vue2') = require('@vue/
 
 export const compile: typeof CompilerDOM.compile = (template, options = {}) => {
 	if (typeof template !== 'string') {
-		throw new Error(`[@vue/language-core] compile() first argument must be string.`);
+		throw new Error(`[@azee/vue-language-core] compile() first argument must be string.`);
 	}
 
 	const onError = options.onError;

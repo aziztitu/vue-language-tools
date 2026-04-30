@@ -6,9 +6,9 @@ import type {
 	LanguageServicePlugin,
 	TextDocument,
 } from '@volar/language-service';
-import { hyphenateAttr, hyphenateTag, tsCodegen, type VueVirtualCode } from '@vue/language-core';
+import { hyphenateAttr, hyphenateTag, tsCodegen, type VueVirtualCode } from '@azee/vue-language-core';
 import { camelize, capitalize } from '@vue/shared';
-import type { ComponentPropInfo } from '@vue/typescript-plugin/lib/requests/getComponentProps';
+import type { ComponentPropInfo } from '@azee/vue-typescript-plugin/lib/requests/getComponentProps';
 import { create as createHtmlService } from 'volar-service-html';
 import { create as createPugService } from 'volar-service-pug';
 import * as html from 'vscode-html-languageservice';
@@ -44,7 +44,7 @@ export function create(
 		getComponentEvents,
 		getComponentDirectives,
 		getComponentSlots,
-	}: import('@vue/typescript-plugin/lib/requests').Requests,
+	}: import('@azee/vue-typescript-plugin/lib/requests').Requests,
 ): LanguageServicePlugin {
 	let customData: html.IHTMLDataProvider[] = [];
 	let extraCustomData: html.IHTMLDataProvider[] = [];

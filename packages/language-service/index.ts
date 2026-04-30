@@ -1,10 +1,10 @@
 /// <reference types="@volar/typescript" />
 
 export * from '@volar/language-service';
-// for @vue/language-server usage
+// for @azee/vue-language-server usage
 export * from '@volar/language-service/lib/utils/featureWorkers';
 
-import type { Requests } from '@vue/typescript-plugin/lib/requests';
+import type { Requests } from '@azee/vue-typescript-plugin/lib/requests';
 import { create as createEmmetPlugin } from 'volar-service-emmet';
 import { create as createJsonPlugin } from 'volar-service-json';
 import { create as createPugFormatPlugin } from 'volar-service-pug-beautify';

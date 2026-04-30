@@ -3,7 +3,7 @@ import { convertClassificationsToSemanticTokens } from 'volar-service-typescript
 import { resolveEmbeddedCode } from '../utils';
 
 export function create(
-	{ getEncodedSemanticClassifications }: import('@vue/typescript-plugin/lib/requests').Requests,
+	{ getEncodedSemanticClassifications }: import('@azee/vue-typescript-plugin/lib/requests').Requests,
 ): LanguageServicePlugin {
 	return {
 		name: 'typescript-semantic-tokens',

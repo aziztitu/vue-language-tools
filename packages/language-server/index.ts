@@ -6,13 +6,13 @@ import {
 	createParsedCommandLine,
 	createParsedCommandLineByJson,
 	createVueLanguagePlugin,
-} from '@vue/language-core';
+} from '@azee/vue-language-core';
 import {
 	createLanguageService,
 	createUriMap,
 	createVueLanguageServicePlugins,
 	type LanguageService,
-} from '@vue/language-service';
+} from '@azee/vue-language-service';
 import * as ts from 'typescript';
 import { URI } from 'vscode-uri';
 

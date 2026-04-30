@@ -1,4 +1,4 @@
-import { tsCodegen, type VueVirtualCode } from '@vue/language-core';
+import { tsCodegen, type VueVirtualCode } from '@azee/vue-language-core';
 import type * as ts from 'typescript';
 import { getVariableType } from './utils';
 

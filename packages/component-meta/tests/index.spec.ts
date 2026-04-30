@@ -3,7 +3,7 @@ import { describe, expect, test } from 'vitest';
 import { type ComponentMetaChecker, createChecker, createCheckerByJson, type MetaCheckerOptions, TypeMeta } from '..';
 
 const worker = (checker: ComponentMetaChecker, withTsconfig: boolean) =>
-	describe(`vue-component-meta ${withTsconfig ? 'w/ tsconfig' : 'w/o tsconfig'}`, () => {
+	describe(`@azee/vue-component-meta ${withTsconfig ? 'w/ tsconfig' : 'w/o tsconfig'}`, () => {
 		test('empty-component', () => {
 			const componentPath = path.resolve(
 				__dirname,

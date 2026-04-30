@@ -1,10 +1,10 @@
 import type { LanguageServicePlugin, SemanticToken } from '@volar/language-service';
-import { forEachElementNode, hyphenateTag } from '@vue/language-core';
+import { forEachElementNode, hyphenateTag } from '@azee/vue-language-core';
 import type * as ts from 'typescript';
 import { resolveEmbeddedCode } from '../utils';
 
 export function create(
-	{ getComponentNames, getElementNames }: import('@vue/typescript-plugin/lib/requests').Requests,
+	{ getComponentNames, getElementNames }: import('@azee/vue-typescript-plugin/lib/requests').Requests,
 ): LanguageServicePlugin {
 	return {
 		name: 'vue-component-semantic-tokens',

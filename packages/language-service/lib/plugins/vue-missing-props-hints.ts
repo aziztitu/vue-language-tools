@@ -5,13 +5,13 @@ import type {
 	LanguageServicePlugin,
 	TextDocument,
 } from '@volar/language-service';
-import { hyphenateAttr, hyphenateTag } from '@vue/language-core';
+import { hyphenateAttr, hyphenateTag } from '@azee/vue-language-core';
 import * as html from 'vscode-html-languageservice';
 import { AttrNameCasing, checkCasing } from '../nameCasing';
 import { resolveEmbeddedCode } from '../utils';
 
 export function create(
-	{ getComponentNames, getElementNames, getComponentProps }: import('@vue/typescript-plugin/lib/requests').Requests,
+	{ getComponentNames, getElementNames, getComponentProps }: import('@azee/vue-typescript-plugin/lib/requests').Requests,
 ): LanguageServicePlugin {
 	return {
 		name: 'vue-missing-props-hints',

@@ -1,5 +1,5 @@
 import type { InsertTextFormat, LanguageServicePlugin, WorkspaceEdit } from '@volar/language-service';
-import { forEachEmbeddedCode } from '@vue/language-core';
+import { forEachEmbeddedCode } from '@azee/vue-language-core';
 import { camelize, capitalize, hyphenate } from '@vue/shared';
 import { posix as path } from 'path-browserify';
 import { getUserPreferences } from 'volar-service-typescript/lib/configs/getUserPreferences';
@@ -10,7 +10,7 @@ import { resolveEmbeddedCode } from '../utils';
 
 export function create(
 	ts: typeof import('typescript'),
-	{ getImportPathForFile }: import('@vue/typescript-plugin/lib/requests').Requests,
+	{ getImportPathForFile }: import('@azee/vue-typescript-plugin/lib/requests').Requests,
 ): LanguageServicePlugin {
 	return {
 		name: 'vue-document-drop',

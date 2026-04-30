@@ -1,5 +1,5 @@
 import type { LanguageServicePlugin } from '@volar/language-service';
-import { tsCodegen } from '@vue/language-core';
+import { tsCodegen } from '@azee/vue-language-core';
 import { resolveEmbeddedCode } from '../utils';
 
 export function create(): LanguageServicePlugin {

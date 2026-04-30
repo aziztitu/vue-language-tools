@@ -378,7 +378,7 @@
 - **language-core:** Plugin API 2.1
   - Added plugin hooks: `getLanguageId`, `isValidFile`, `parseSFC2`
   - Improve backward compatibility (#4585) - Thanks @zhiyuanzmj
-- **language-core:** support default prop when using __typeProps (#4602) - Thanks @zhiyuanzmj
+- **language-core:** support default prop when using \_\_typeProps (#4602) - Thanks @zhiyuanzmj
 - **language-core:** improve nested plugins (#4581) - Thanks @zhiyuanzmj
 - **language-service:** remove `v-bind` code action (#4601)
 - **vscode:** add empty pattern to codeblock attributes scope (#4590) - Thanks @KermanX
@@ -423,9 +423,9 @@
 ### Other Changes
 
 - Upgraded Volar from `v2.4.0-alpha.2` to `v2.4.0-alpha.15`:
-	- Fixed an issue where, when Hybrid Mode is disabled, TS support for Vue files not included in tsconfig may be missing.
-	- Improved the consistency of `vue-tsc` and `tsc` behavior. (#3526)
-	- Fixed the `--clean` flag support for `vue-tsc`.
+  - Fixed an issue where, when Hybrid Mode is disabled, TS support for Vue files not included in tsconfig may be missing.
+  - Improved the consistency of `vue-tsc` and `tsc` behavior. (#3526)
+  - Fixed the `--clean` flag support for `vue-tsc`.
 - Updated the high-level overview mermaid diagram.
 - Added 'expected' and 'actually happening' sections to the bug report template. (#4515) - Thanks, @davidmatter.
 
@@ -893,13 +893,13 @@ Download Pages: [GitHub Releases](https://github.com/volarjs/insiders/releases/t
 
 ## 2.0.7 (2024/3/20)
 
-> [!NOTE] 
+> [!NOTE]
 > Hybrid Mode is now disabled by default, you need to enable `vue.server.hybridMode` in settings to enable it explicitly.
 
 ### Features
 
 - **language-server:** reintroducing full TS support and disable Hybrid Mode by default (#4119)
-- **vscode:** check outdated `@vue/language-plugin-pug` in doctor
+- **vscode:** check outdated `@azee/vue-language-plugin-pug` in doctor
 - **vscode:** significantly reduces the status bar space occupied
 
 ### Bug Fixes
@@ -919,7 +919,7 @@ Download Pages: [GitHub Releases](https://github.com/volarjs/insiders/releases/t
 
 ## 2.0.6 (2024/3/7)
 
-> [!IMPORTANT] 
+> [!IMPORTANT]
 > If the TypeScript language server crashes since 2.0, please try using VSCode Insiders and install [JavaScript and TypeScript Nightly](https://marketplace.visualstudio.com/items?itemName=ms-vscode.vscode-typescript-next), or temporarily downgrade to 1.8.27.\
 > Issue: https://github.com/vuejs/language-tools/issues/3962
 >
@@ -1004,22 +1004,22 @@ Download Pages: [GitHub Releases](https://github.com/volarjs/insiders/releases/t
 ### Features
 
 - Hybrid Mode
-	- Takeover Mode has been deprecated. The extension now has the same performance as Takeover Mode by default.
-	- TypeScript language support has been moved from Vue language server to TypeScript plugin (#3788)
-	- Integrated all TypeScript editor features
-	- Warn when internal TypeScript extension is disabled or "TypeScript Vue Plugin" extension is installed
-	- Migrated to named pipe server using TypeScript LanguageService (#3908, #3916)
-	- `typescript.tsdk` duplicate registration errors are no longer reported
-	- **language-service:** reimplemented component tag semantic tokens in TypeScript plugin (#3915)
-	- **language-service:** reimplemented auto-import patching in TypeScript plugin (#3917)
-	- **language-service:** ensured tsserver readiness when requesting auto insert `.value` (#3914)
+  - Takeover Mode has been deprecated. The extension now has the same performance as Takeover Mode by default.
+  - TypeScript language support has been moved from Vue language server to TypeScript plugin (#3788)
+  - Integrated all TypeScript editor features
+  - Warn when internal TypeScript extension is disabled or "TypeScript Vue Plugin" extension is installed
+  - Migrated to named pipe server using TypeScript LanguageService (#3908, #3916)
+  - `typescript.tsdk` duplicate registration errors are no longer reported
+  - **language-service:** reimplemented component tag semantic tokens in TypeScript plugin (#3915)
+  - **language-service:** reimplemented auto-import patching in TypeScript plugin (#3917)
+  - **language-service:** ensured tsserver readiness when requesting auto insert `.value` (#3914)
 - Upgraded to Volar 2.0 and 2.1 (#3736, #3906)
-	- **vscode:** extension now compatible with [Volar Labs](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volarjs-labs) v2
-	- **vscode:** removed `volar.format.initialIndent` option, replaced with 3 new options:
-		- `vue.format.template.initialIndent`
-		- `vue.format.script.initialIndent`
-		- `vue.format.style.initialIndent`
-	- **language-server:** `ignoreTriggerCharacters`, `reverseConfigFilePriority` and `fullCompletionList` options are no longer supported
+  - **vscode:** extension now compatible with [Volar Labs](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volarjs-labs) v2
+  - **vscode:** removed `volar.format.initialIndent` option, replaced with 3 new options:
+    - `vue.format.template.initialIndent`
+    - `vue.format.script.initialIndent`
+    - `vue.format.style.initialIndent`
+  - **language-server:** `ignoreTriggerCharacters`, `reverseConfigFilePriority` and `fullCompletionList` options are no longer supported
 - Supported Component Drag and Drop Import (#3692)
 - **tsc:** supported `vueCompilerOptions.extensions` option (#3800)
 - **language-core:** achieved compatibility with Vue 3.4 type changes (#3860)
@@ -1048,6 +1048,6 @@ Download Pages: [GitHub Releases](https://github.com/volarjs/insiders/releases/t
 - **language-service:** made service plugins independent of project context
 - **language-server:** `volar.config.js` is no longer supported
 - **component-meta:** renamed APIs
-- **typescript-plugin:** renamed package to `@vue/typescript-plugin` (#3910)
+- **typescript-plugin:** renamed package to `@azee/vue-typescript-plugin` (#3910)
 - **tsc:** rewritten based on first-party TS API and no longer relies on TypeScript module (#3795)
 - **tsc:** deprecated hooks API (#3793)

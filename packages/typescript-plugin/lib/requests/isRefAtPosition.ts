@@ -1,6 +1,6 @@
 /// <reference types="@volar/typescript" />
 
-import { isCompletionEnabled, type Language, type SourceScript, type VueVirtualCode } from '@vue/language-core';
+import { isCompletionEnabled, type Language, type SourceScript, type VueVirtualCode } from '@azee/vue-language-core';
 import type * as ts from 'typescript';
 
 export function isRefAtPosition(

@@ -7,7 +7,7 @@ import type {
 	LanguageServicePlugin,
 	SymbolKind,
 } from '@volar/language-service';
-import { VueVirtualCode } from '@vue/language-core';
+import { VueVirtualCode } from '@azee/vue-language-core';
 import { create as createHtmlService } from 'volar-service-html';
 import * as html from 'vscode-html-languageservice';
 import { loadLanguageBlocks } from '../data';

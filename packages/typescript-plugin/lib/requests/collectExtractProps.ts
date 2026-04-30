@@ -1,4 +1,4 @@
-import { isSemanticTokensEnabled, type Language, type SourceScript, type VueVirtualCode } from '@vue/language-core';
+import { isSemanticTokensEnabled, type Language, type SourceScript, type VueVirtualCode } from '@azee/vue-language-core';
 import type * as ts from 'typescript';
 
 interface ExtractPropsInfo {

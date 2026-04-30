@@ -1,7 +1,7 @@
 name: "\U0001F41E Bug report"
 description: Create a report to help us improve
 type: Bug
-labels: ["pending triage"]
+labels: ['pending triage']
 body:
   - type: markdown
     attributes:
@@ -20,7 +20,7 @@ body:
   - type: input
     id: version
     attributes:
-      label: Vue - Official extension or vue-tsc version
+      label: Vue - Official extension or @azee/vue-tsc version
     validations:
       required: true
   - type: input

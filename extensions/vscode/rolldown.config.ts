@@ -37,11 +37,11 @@ const config: RolldownOptions = {
 					fs.mkdirSync(resolve('./dist'), { recursive: true });
 					fs.writeFileSync(
 						resolve('./dist/language-server.js'),
-						`module.exports = require('../node_modules/@vue/language-server/index.js');`,
+						`module.exports = require('../node_modules/@azee/vue-language-server/index.js');`,
 					);
 					fs.writeFileSync(
 						resolve('./dist/typescript-plugin.js'),
-						`module.exports = require('../node_modules/@vue/typescript-plugin/index.js');`,
+						`module.exports = require('../node_modules/@azee/vue-typescript-plugin/index.js');`,
 					);
 				}
 			},
@@ -77,8 +77,8 @@ const config: RolldownOptions = {
 if (!isDev) {
 	config.input = {
 		...config.input as Record<string, string>,
-		'language-server': './node_modules/@vue/language-server/index.js',
-		'typescript-plugin': './node_modules/@vue/typescript-plugin/index.js',
+		'language-server': './node_modules/@azee/vue-language-server/index.js',
+		'typescript-plugin': './node_modules/@azee/vue-typescript-plugin/index.js',
 	};
 }
 
