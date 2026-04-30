@@ -1,7 +1,7 @@
 {
   "private": false,
   "name": "@azee/vue-component-meta",
-  "version": "2.3.17",
+  "version": "2.3.18",
   "license": "MIT",
   "publishConfig": {
     "access": "public"
@@ -17,8 +17,8 @@
     "directory": "packages/component-meta"
   },
   "dependencies": {
-    "@azee/vue-component-type-helpers": "^2.3.17",
-    "@azee/vue-language-core": "^2.3.17",
+    "@azee/vue-component-type-helpers": "^2.3.18",
+    "@azee/vue-language-core": "^2.3.18",
     "@volar/typescript": "2.4.11",
     "path-browserify": "^1.0.1"
   },

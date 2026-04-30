@@ -1,7 +1,7 @@
 {
   "private": false,
   "name": "@azee/vue-language-service",
-  "version": "2.3.17",
+  "version": "2.3.18",
   "license": "MIT",
   "publishConfig": {
     "access": "public"
@@ -21,8 +21,8 @@
     "update-html-data": "node ./scripts/update-html-data.js"
   },
   "dependencies": {
-    "@azee/vue-language-core": "^2.3.17",
-    "@azee/vue-typescript-plugin": "^2.3.17",
+    "@azee/vue-language-core": "^2.3.18",
+    "@azee/vue-typescript-plugin": "^2.3.18",
     "@volar/language-core": "2.4.11",
     "@volar/language-service": "2.4.11",
     "@volar/typescript": "2.4.11",

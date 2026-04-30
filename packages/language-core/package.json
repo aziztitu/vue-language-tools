@@ -1,7 +1,7 @@
 {
   "private": false,
   "name": "@azee/vue-language-core",
-  "version": "2.3.17",
+  "version": "2.3.18",
   "license": "MIT",
   "publishConfig": {
     "access": "public"

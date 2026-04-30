@@ -1,7 +1,7 @@
 {
   "private": false,
   "name": "@azee/vue-tsc",
-  "version": "2.3.17",
+  "version": "2.3.18",
   "license": "MIT",
   "publishConfig": {
     "access": "public"
@@ -24,7 +24,7 @@
     "typescript": ">=5.0.0"
   },
   "dependencies": {
-    "@azee/vue-language-core": "^2.3.17",
+    "@azee/vue-language-core": "^2.3.18",
     "@volar/typescript": "2.4.11"
   },
   "devDependencies": {
