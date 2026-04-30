@@ -1,6 +1,7 @@
 {
+  "private": false,
   "name": "@azee/vue-component-meta",
-  "version": "2.3.7",
+  "version": "2.3.16",
   "license": "MIT",
   "files": [
     "**/*.js",
@@ -13,8 +14,8 @@
     "directory": "packages/component-meta"
   },
   "dependencies": {
-    "@azee/vue-component-type-helpers": "2.3.7",
-    "@azee/vue-language-core": "2.3.7",
+    "@azee/vue-component-type-helpers": "^2.3.16",
+    "@azee/vue-language-core": "^2.3.16",
     "@volar/typescript": "2.4.11",
     "path-browserify": "^1.0.1"
   },
@@ -30,5 +31,5 @@
     "@types/node": "^22.10.4",
     "@types/path-browserify": "^1.0.1"
   },
-  "gitHead": "3e59253e0e448f6bd80d233b8df86894683401e1"
+  "gitHead": "1619a162fcf52ce80109fec5545795e9bf1e46df"
 }

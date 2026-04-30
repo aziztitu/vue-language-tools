@@ -1,6 +1,6 @@
-# vue-component-type-helpers
+# @azee/vue-component-type-helpers
 
-Some very simple type helpers used behind `vue-component-meta` for extract component props, slots, emit, exposed types.
+Some very simple type helpers used behind `@azee/vue-component-meta` for extract component props, slots, emit, exposed types.
 
 ## Usage
 
@@ -19,7 +19,7 @@ defineProps<{
 
 ```ts
 import HelloWorld from './HelloWorld.vue'
-import type { ComponentProps, ComponentSlots } from 'vue-component-type-helpers'
+import type { ComponentProps, ComponentSlots } from '@azee/vue-component-type-helpers'
 
 type Props = ComponentProps<typeof HelloWorld> // { msg: string }
 type Slots = ComponentSlots<typeof HelloWorld> // { header?: (props: { num: number; }) => any; footer?: (props: { str: string; }) => any; }

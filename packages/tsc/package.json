@@ -1,6 +1,7 @@
 {
+  "private": false,
   "name": "@azee/vue-tsc",
-  "version": "2.3.7",
+  "version": "2.3.16",
   "license": "MIT",
   "files": [
     "bin",
@@ -20,11 +21,11 @@
     "typescript": ">=5.0.0"
   },
   "dependencies": {
-    "@azee/vue-language-core": "2.3.7",
+    "@azee/vue-language-core": "^2.3.16",
     "@volar/typescript": "2.4.11"
   },
   "devDependencies": {
     "@types/node": "^22.10.4"
   },
-  "gitHead": "3e59253e0e448f6bd80d233b8df86894683401e1"
+  "gitHead": "1619a162fcf52ce80109fec5545795e9bf1e46df"
 }

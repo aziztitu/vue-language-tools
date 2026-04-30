@@ -10,15 +10,11 @@
 			"runtimeExecutable": "${execPath}",
 			"args": [
 				"--extensionDevelopmentPath=${workspaceRoot}/extensions/vscode",
-				"--folder-uri=${workspaceRoot}/test-workspace",
+				"--folder-uri=D://Documents/Projects/xgenize/repos/xgenize-source",
 			],
 			"outFiles": [
 				"${workspaceRoot}/**/*.js"
 			],
-			"preLaunchTask": {
-				"type": "npm",
-				"script": "watch"
-			}
 		},
 		{
 			"name": "Launch Web Client",

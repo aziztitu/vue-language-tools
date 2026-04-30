@@ -1,8 +1,8 @@
 {
   "private": true,
-  "version": "2.3.7",
+  "version": "2.3.16",
   "devDependencies": {
-    "@azee/vue-component-type-helpers": "2.3.7",
+    "@azee/vue-component-type-helpers": "2.3.16",
     "typescript-next": "npm:typescript@5.7.0-dev.20240926",
     "typescript-stable": "npm:typescript@~5.6.0",
     "vue": "^3.5.0",

@@ -1,0 +1,85 @@
+0 silly argv {
+0 silly argv   _: [ 'version' ],
+0 silly argv   'force-publish': true,
+0 silly argv   forcePublish: true,
+0 silly argv   lernaVersion: '9.0.7',
+0 silly argv   '$0': 'C:\\nvm4w\\nodejs\\node_modules\\lerna\\dist\\cli.js'
+0 silly argv }
+1 notice cli v9.0.7
+2 verbose packageConfigs Explicit "packages" configuration found in lerna.json. Resolving packages using the configured glob(s): ["extensions/**","packages/**","test-workspace"]
+3 verbose rootPath D:\Documents\Projects\xgenize\repos\vue-language-tools
+4 info current version 2.3.15
+5 silly isAnythingCommitted
+6 verbose isAnythingCommitted 1
+7 silly getCurrentBranch
+8 verbose currentBranch v2
+9 silly remoteBranchExists
+10 silly isBehindUpstream
+11 silly isBehindUpstream v2 is behind origin/v2 by 0 commit(s) and ahead by 0
+12 silly hasTags
+13 verbose hasTags true
+14 silly git-describe.sync "v2.3.7-0-g1619a162f-dirty" => {"lastTagName":"v2.3.7","lastVersion":"v2.3.7","refCount":"0","sha":"1619a162f","isDirty":true}
+15 warn force-publish all packages
+16 info Assuming all packages changed
+17 verbose updated volar
+18 verbose updated @azee/vue-component-meta
+19 verbose updated @azee/vue-component-type-helpers
+20 verbose updated @azee/vue-language-core
+21 verbose updated @azee/vue-language-plugin-pug
+22 verbose updated @azee/vue-language-server
+23 verbose updated @azee/vue-language-service
+24 verbose updated @azee/vue-tsc
+25 verbose updated @azee/vue-typescript-plugin
+26 verbose updated undefined
+27 info execute Skipping releases
+28 silly lifecycle No script for "preversion" in "vue-language-tools", continuing
+29 silly lifecycle No script for "preversion" in "@azee/vue-component-type-helpers", continuing
+30 silly lifecycle No script for "preversion" in "@azee/vue-language-core", continuing
+31 silly lifecycle No script for "preversion" in undefined, continuing
+32 verbose version @azee/vue-language-core has no lockfile. Skipping lockfile update.
+33 verbose version @azee/vue-component-type-helpers has no lockfile. Skipping lockfile update.
+34 verbose version undefined has no lockfile. Skipping lockfile update.
+35 silly lifecycle No script for "version" in "@azee/vue-language-core", continuing
+36 silly lifecycle No script for "preversion" in "@azee/vue-language-plugin-pug", continuing
+37 silly lifecycle No script for "preversion" in "@azee/vue-tsc", continuing
+38 silly lifecycle No script for "preversion" in "@azee/vue-typescript-plugin", continuing
+39 silly lifecycle No script for "version" in "@azee/vue-component-type-helpers", continuing
+40 silly lifecycle No script for "preversion" in "@azee/vue-component-meta", continuing
+41 silly lifecycle No script for "version" in undefined, continuing
+42 verbose version @azee/vue-tsc has no lockfile. Skipping lockfile update.
+43 verbose version @azee/vue-language-plugin-pug has no lockfile. Skipping lockfile update.
+44 verbose version @azee/vue-typescript-plugin has no lockfile. Skipping lockfile update.
+45 verbose version @azee/vue-component-meta has no lockfile. Skipping lockfile update.
+46 silly lifecycle No script for "version" in "@azee/vue-tsc", continuing
+47 silly lifecycle No script for "version" in "@azee/vue-language-plugin-pug", continuing
+48 silly lifecycle No script for "version" in "@azee/vue-typescript-plugin", continuing
+49 silly lifecycle No script for "preversion" in "@azee/vue-language-service", continuing
+50 silly lifecycle No script for "version" in "@azee/vue-component-meta", continuing
+51 verbose version @azee/vue-language-service has no lockfile. Skipping lockfile update.
+52 silly lifecycle No script for "version" in "@azee/vue-language-service", continuing
+53 silly lifecycle No script for "preversion" in "@azee/vue-language-server", continuing
+54 verbose version @azee/vue-language-server has no lockfile. Skipping lockfile update.
+55 silly lifecycle No script for "version" in "@azee/vue-language-server", continuing
+56 silly lifecycle No script for "preversion" in "volar", continuing
+57 verbose version volar has no lockfile. Skipping lockfile update.
+58 silly lifecycle No script for "version" in "volar", continuing
+59 silly lifecycle No script for "version" in "vue-language-tools", continuing
+60 verbose version Updating root pnpm-lock.yaml
+61 error Error: Command failed with exit code 1: pnpm install --lockfile-only --ignore-scripts
+61 error Scope: all 11 workspace projects
+61 error  WARN  `node_modules` is present. Lockfile only installation will make it out-of-date
+61 error Progress: resolved 1, reused 0, downloaded 0, added 0
+61 error test-workspace                           |  WARN  deprecated vue@2.7.16
+61 error D:\Documents\Projects\xgenize\repos\vue-language-tools\test-workspace:
+61 error  ERR_PNPM_FETCH_404  GET https://registry.npmjs.org/@azee%2Fvue-component-type-helpers: Not Found - 404
+61 error
+61 error This error happened while installing a direct dependency of D:\Documents\Projects\xgenize\repos\vue-language-tools\test-workspace
+61 error
+61 error @azee/vue-component-type-helpers is not in the npm registry, or you have no permission to fetch it.
+61 error
+61 error An authorization header was used: Bearer npm_[hidden]
+61 error     at makeError (C:\Users\azizt\AppData\Local\nvm\v22.21.1\node_modules\lerna\node_modules\execa\lib\error.js:59:11)
+61 error     at handlePromise (C:\Users\azizt\AppData\Local\nvm\v22.21.1\node_modules\lerna\node_modules\execa\index.js:114:26)
+61 error     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+61 error     at async VersionCommand.updatePackageVersions (C:\Users\azizt\AppData\Local\nvm\v22.21.1\node_modules\lerna\dist\index.js:9774:11)
+61 error     at async Promise.all (index 0)

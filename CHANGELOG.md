@@ -903,7 +903,7 @@ Download Pages: [GitHub Releases](https://github.com/volarjs/insiders/releases/t
 ### Features
 
 - **language-server:** reintroducing full TS support and disable Hybrid Mode by default (#4119)
-- **vscode:** check outdated `@vue/language-plugin-pug` in doctor
+- **vscode:** check outdated `@azee/vue-language-plugin-pug` in doctor
 - **vscode:** significantly reduces the status bar space occupied
 
 ### Bug Fixes
@@ -1052,7 +1052,7 @@ Download Pages: [GitHub Releases](https://github.com/volarjs/insiders/releases/t
 - **language-service:** made service plugins independent of project context
 - **language-server:** `volar.config.js` is no longer supported
 - **component-meta:** renamed APIs
-- **typescript-plugin:** renamed package to `@vue/typescript-plugin` (#3910)
+- **typescript-plugin:** renamed package to `@azee/vue-typescript-plugin` (#3910)
 - **tsc:** rewritten based on first-party TS API and no longer relies on TypeScript module (#3795)
 - **tsc:** deprecated hooks API (#3793)
 
@@ -1071,7 +1071,7 @@ Download Pages: [GitHub Releases](https://github.com/volarjs/insiders/releases/t
 
 ## 1.8.24 (2023/11/29)
 
-- refactor(component-type-helpers): vue 2 types now move to `vue-component-type-helpers/vue2` ([#3404](https://github.com/vuejs/language-tools/issues/3404))
+- refactor(component-type-helpers): vue 2 types now move to `@azee/vue-component-type-helpers/vue2` ([#3404](https://github.com/vuejs/language-tools/issues/3404))
 - feat(language-core): expose `defineEmits`'s `arg` and `typeArg` in `parseScriptSetupRanges` ([#3710](https://github.com/vuejs/language-tools/issues/3710)) - thanks @so1ve
 - fix(language-core): `strictTemplates` fails to report unknown components ([#3539](https://github.com/vuejs/language-tools/issues/3539))
 - fix(language-core): script syntax breaks if script options does not have trailing comma ([#3755](https://github.com/vuejs/language-tools/issues/3755))
@@ -1186,7 +1186,7 @@ Download Pages: [GitHub Releases](https://github.com/volarjs/insiders/releases/t
 - feat(vscode): add `vue.server.path` setting for customize server module path
 - fix: correctly hyphen-case props ([#3424](https://github.com/vuejs/language-tools/issues/3424)) - thanks @so1ve
 - fix: generic components should respect `strictTemplates` ([#3487](https://github.com/vuejs/language-tools/issues/3487)) - thanks @so1ve
-- fix(vue-component-type-helpers): correctly handle generic components when using `ComponentExposed` ([#3536](https://github.com/vuejs/language-tools/issues/3536)) - thanks @so1ve
+- fix(@azee/vue-component-type-helpers): correctly handle generic components when using `ComponentExposed` ([#3536](https://github.com/vuejs/language-tools/issues/3536)) - thanks @so1ve
 
 ## 1.8.8 (2023/7/27)
 
@@ -1427,7 +1427,7 @@ Download Pages: [GitHub Releases](https://github.com/volarjs/insiders/releases/t
 ## 1.5.4 (2023/4/26) - pre-release
 
 - fix: `defineExpose` macro missing for Vue 3.3
-- fix(component-meta): meta info is empty if missing `vue-component-type-helpers` dependency
+- fix(component-meta): meta info is empty if missing `@azee/vue-component-type-helpers` dependency
 - fix: don't check time for codeActions when saving multiple files
 
 ## 1.5.3 (2023/4/26) - pre-release
@@ -1540,8 +1540,8 @@ For more details, see [#2620](https://github.com/vuejs/language-tools/issues/262
 
 ## 1.3.14 (2023/4/10) - pre-release
 
-- feat: add `vue-component-type-helpers` package ([#2590](https://github.com/vuejs/language-tools/issues/2590))
-- feat(component-meta): integrated `vue-component-type-helpers`
+- feat: add `@azee/vue-component-type-helpers` package ([#2590](https://github.com/vuejs/language-tools/issues/2590))
+- feat(component-meta): integrated `@azee/vue-component-type-helpers`
 - feat: upgrade to lerna-lite 2.0 ([#2597](https://github.com/vuejs/language-tools/issues/2597)) - thanks @ghiscoding
 - feat: support prop renaming for defineModel and defineProp
 - fix: template-based slots type incorrect ([#2590](https://github.com/vuejs/language-tools/issues/2590))
@@ -1619,8 +1619,8 @@ For more details, see [#2620](https://github.com/vuejs/language-tools/issues/262
 
 - feat: disable `missingRequiredProps`, `eventArgumentInInlineHandlers` by default
 - fix: `vueCompilerOptions` cannot extends from non-relative paths ([#2345](https://github.com/vuejs/language-tools/issues/2345)) - thanks @dschmidt
-- fix(vue-component-meta): `exposed` missing when use TS 5.0
-- perf(vue-component-meta): `props`, `events`, `slots`, `exposed` lazy calculation
+- fix(@azee/vue-component-meta): `exposed` missing when use TS 5.0
+- perf(@azee/vue-component-meta): `props`, `events`, `slots`, `exposed` lazy calculation
 - perf: provide change range of virtual file snapshot for typescript program
 
 ## 1.3.2 (2023/3/14) - pre-release
@@ -1628,7 +1628,7 @@ For more details, see [#2620](https://github.com/vuejs/language-tools/issues/262
 - feat(language-server): declare workspaceFolders support in server capabilities for IDEs (https://github.com/volarjs/volar.js/pull/18) - thanks @the-mikedavis
 - feat(vue-tsc): supports incremental emit (https://github.com/volarjs/volar.js/pull/17) - thanks @blake-newman
 - feat: allow code actions to run rename command after applying ([#2498](https://github.com/vuejs/language-tools/issues/2498)) (https://github.com/volarjs/plugins/pull/29) - thanks @zardoy
-- perf(vue-component-meta): faster initialization ([#2506](https://github.com/vuejs/language-tools/issues/2506)) - thanks @stafyniaksacha
+- perf(@azee/vue-component-meta): faster initialization ([#2506](https://github.com/vuejs/language-tools/issues/2506)) - thanks @stafyniaksacha
 - perf: search tsconfig on demand (https://github.com/volarjs/volar.js/pull/16)
 
 ## 1.3.0 (2023/3/10) - pre-release
@@ -1798,7 +1798,7 @@ For more details, see [#2620](https://github.com/vuejs/language-tools/issues/262
 - fix: TS `typescript/javascript.preferences.autoImportFileExcludePatterns` setting not working
 - fix: formatting not working for extra vue file extensions ([#2263](https://github.com/vuejs/language-tools/issues/2263))
 - fix(doctor): accidentally report `@vue/compiler-dom` warning ([#2262](https://github.com/vuejs/language-tools/issues/2262))
-- fix(vue-component-meta): `required` property incorrect ([#2256](https://github.com/vuejs/language-tools/issues/2256))
+- fix(@azee/vue-component-meta): `required` property incorrect ([#2256](https://github.com/vuejs/language-tools/issues/2256))
 - fix(preview): cannot start preview if project never start run vite server ([#2223](https://github.com/vuejs/language-tools/issues/2223))
 - fix: references codeLens not working
 
@@ -1988,7 +1988,7 @@ For more details, see [#2620](https://github.com/vuejs/language-tools/issues/262
 - feat: Support generic typed template slots for RFC 436 ([#1987](https://github.com/vuejs/language-tools/issues/1987))
 - feat: add `resolveTemplateCompilerOptions` API for `VueLanguagePlugin`
 - feat: support intellisense for `generic` attribute ([#1967](https://github.com/vuejs/language-tools/issues/1967))
-- feat: add `Show Component Meta` command for inspect `vue-component-meta` result
+- feat: add `Show Component Meta` command for inspect `@azee/vue-component-meta` result
 - feat: add `vueCompilerOptions.experimentalModelPropName` for customize `v-model` binding prop for vue 2 component ([#1969](https://github.com/vuejs/language-tools/issues/1969))
 - fix: `TypeScript Vue Plugin (Volar)` stop working
 - fix: change `vueCompilerOptions.dataAttributes` default value from `["data-*"]` to `[]` ([#1965](https://github.com/vuejs/language-tools/issues/1965))
@@ -2057,7 +2057,7 @@ For more details, see [#2620](https://github.com/vuejs/language-tools/issues/262
 
 [[Download](https://github.com/vuejs/language-tools/issues/1880)]
 
-- feat(vue-component-meta): add file update apis for support HMR ([#1889](https://github.com/vuejs/language-tools/issues/1889))
+- feat(@azee/vue-component-meta): add file update apis for support HMR ([#1889](https://github.com/vuejs/language-tools/issues/1889))
 - feat: add `dataAttributes`, `htmlAttributes` options for vueCompilerOptions ([#1871](https://github.com/vuejs/language-tools/issues/1871))
 - feat: support for `typescript.autoImportFileExcludePatterns`
 
@@ -2296,13 +2296,13 @@ For more details, see [#2620](https://github.com/vuejs/language-tools/issues/262
 - perf: incremental update SFC blocks without full parse SFC and mitigate memory leak
 - perf: incremental update html template interpolation without recompile template
 - perf: cache `ts.createSourceFile` for tsx code gen
-- fix(vue-component-meta): cannot create checker with TS 4.8.2
+- fix(@azee/vue-component-meta): cannot create checker with TS 4.8.2
 - fix: document features not working on Web IDE ([#1479](https://github.com/vuejs/language-tools/issues/1479))
 - fix: avoid auto complete triggers too aggressive in Sublime (https://github.com/sublimelsp/LSP-volar/issues/114)
 
 ## 0.40.2 (2022/8/28)
 
-- feat(vue-component-meta): add `createComponentMetaCheckerByJsonConfig` API to support create checker without tsconfig
+- feat(@azee/vue-component-meta): add `createComponentMetaCheckerByJsonConfig` API to support create checker without tsconfig
 - feat: move `highlight dom elements ☑` codeLens to status bar ([#1535](https://github.com/vuejs/language-tools/issues/1535))
 - feat: incremental update diagnostics cache range and avoid flicker ([#1718](https://github.com/vuejs/language-tools/issues/1718))
 - perf: incremental update TS script snapshot ([#1718](https://github.com/vuejs/language-tools/issues/1718))
@@ -2342,9 +2342,9 @@ For more details, see [#2620](https://github.com/vuejs/language-tools/issues/262
 
 ## 0.39.5 (2022/8/6)
 
-- feat(vue-component-meta): add option to expose raw type ([#1674](https://github.com/vuejs/language-tools/issues/1674))
-- fix(vue-component-meta): recursive schema parsing ([#1660](https://github.com/vuejs/language-tools/issues/1660))
-- fix(vue-component-meta): parse defineProps in script setup with option ([#1665](https://github.com/vuejs/language-tools/issues/1665))
+- feat(@azee/vue-component-meta): add option to expose raw type ([#1674](https://github.com/vuejs/language-tools/issues/1674))
+- fix(@azee/vue-component-meta): recursive schema parsing ([#1660](https://github.com/vuejs/language-tools/issues/1660))
+- fix(@azee/vue-component-meta): parse defineProps in script setup with option ([#1665](https://github.com/vuejs/language-tools/issues/1665))
 - fix: SFC syntax broken in vscode v1.70.0 ([#1566](https://github.com/vuejs/language-tools/issues/1566)) ([#1675](https://github.com/vuejs/language-tools/issues/1675))
 - fix: vite app preview not working ([#1668](https://github.com/vuejs/language-tools/issues/1668))
 - fix: diagnosis is slow on windows after v0.39.2 ([#1663](https://github.com/vuejs/language-tools/issues/1663))
@@ -2361,14 +2361,14 @@ For more details, see [#2620](https://github.com/vuejs/language-tools/issues/262
 
 ## 0.39.3 (2022/7/31)
 
-- feat(vue-component-meta): component schema improves ([#1656](https://github.com/vuejs/language-tools/issues/1656))
-- feat(vue-component-meta): support options api props default ([#1649](https://github.com/vuejs/language-tools/issues/1649))
+- feat(@azee/vue-component-meta): component schema improves ([#1656](https://github.com/vuejs/language-tools/issues/1656))
+- feat(@azee/vue-component-meta): support options api props default ([#1649](https://github.com/vuejs/language-tools/issues/1649))
 - feat: add "Volar: Reload Project" command ([#1605](https://github.com/vuejs/language-tools/issues/1605))
 - fix: vue-tsc watch not working ([#1647](https://github.com/vuejs/language-tools/issues/1647))
 
 ## 0.39.2 (2022/7/28)
 
-- feat: vue-component-meta ([#1627](https://github.com/vuejs/language-tools/issues/1627))
+- feat: @azee/vue-component-meta ([#1627](https://github.com/vuejs/language-tools/issues/1627))
 - feat: support for "JavaScript and TypeScript Nightly" ([#1332](https://github.com/vuejs/language-tools/issues/1332))
 - fix: tsx, jsx syntax break by vue directives syntax inject ([#1617](https://github.com/vuejs/language-tools/issues/1617))
 - fix: any type components missing in template when use script setup ([#1608](https://github.com/vuejs/language-tools/issues/1608))

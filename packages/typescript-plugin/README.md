@@ -10,8 +10,8 @@ The LSP client must be configured to explicitly enable this plug-in. This is don
 "initializationOptions":  {
     "plugins": [
         {
-          "name": "@vue/typescript-plugin",
-          "location": "/usr/local/lib/node_modules/@vue/language-server",
+          "name": "@azee/vue-typescript-plugin",
+          "location": "/usr/local/lib/node_modules/@azee/vue-language-server",
           "languages": ["vue"],
         },
     ],

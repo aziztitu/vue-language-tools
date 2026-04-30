@@ -1,6 +1,8 @@
-# Vue Language Tools
+# Vue Language Tools (Custom)
 
 > ⚡ High-performance Vue language tooling based-on [Volar.js](https://volarjs.dev/)
+
+Note: This is a custom version to support Vue 2 SFC Class Components
 
 💬 **#language-tools** on our [Discord Server](https://discord.gg/vue)
 
@@ -10,13 +12,13 @@
 *Vue, Vitepress, petite-vue language support extension for VSCode*
 - [vue-tsc](https://github.com/vuejs/language-tools/tree/master/packages/tsc) \
 *Type-check and dts build command line tool*
-- [vue-component-meta](https://github.com/vuejs/language-tools/tree/master/packages/component-meta) \
+- [@azee/vue-component-meta](https://github.com/vuejs/language-tools/tree/master/packages/component-meta) \
 *Component props, events, slots types information extract tool*
 - [vite-plugin-vue-component-preview](https://github.com/johnsoncodehk/vite-plugin-vue-component-preview) \
 *Vite plugin for support Vue component preview view with `Vue Language Features`*
-- [`@vue/language-server`](/packages/language-server/) \
+- [`@azee/vue-language-server`](/packages/language-server/) \
 *The language server itself*.
-- [`@vue/typescript-plugin`](/packages/typescript-plugin/) \
+- [`@azee/vue-typescript-plugin`](/packages/typescript-plugin/) \
 *Typescript plugin for the language server*.
 
 ## Community Integration
@@ -30,18 +32,18 @@
 <details>
   <summary>How to configure vue language server with neovim and lsp?</summary>
 
-### Hybrid mode configuration (Requires `@vue/language-server` version `^2.0.0`)
+### Hybrid mode configuration (Requires `@azee/vue-language-server` version `^2.0.0`)
 
-Note: The "Take Over" mode has been discontinued. Instead, a new "Hybrid" mode has been introduced. In this mode, the Vue Language Server exclusively manages the CSS/HTML sections. As a result, you must run `@vue/language-server` in conjunction with a TypeScript server that employs `@vue/typescript-plugin`. Below is a streamlined configuration for Neovim's LSP, updated to accommodate the language server following the upgrade to version `2.0.0`.
+Note: The "Take Over" mode has been discontinued. Instead, a new "Hybrid" mode has been introduced. In this mode, the Vue Language Server exclusively manages the CSS/HTML sections. As a result, you must run `@azee/vue-language-server` in conjunction with a TypeScript server that employs `@azee/vue-typescript-plugin`. Below is a streamlined configuration for Neovim's LSP, updated to accommodate the language server following the upgrade to version `2.0.0`.
 
 > For nvim-lspconfig versions below [v1.0.0](https://newreleases.io/project/github/neovim/nvim-lspconfig/release/v1.0.0) use tsserver instead of ts_ls, e.g. `lspconfig.ts_ls.setup`
 
 ```lua
 -- If you are using mason.nvim, you can get the ts_plugin_path like this
 -- local mason_registry = require('mason-registry')
--- local vue_language_server_path = mason_registry.get_package('vue-language-server'):get_install_path() .. '/node_modules/@vue/language-server'
+-- local vue_language_server_path = mason_registry.get_package('vue-language-server'):get_install_path() .. '/node_modules/@azee/vue-language-server'
 
-local vue_language_server_path = '/path/to/@vue/language-server'
+local vue_language_server_path = '/path/to/@azee/vue-language-server'
 
 local lspconfig = require('lspconfig')
 
@@ -49,7 +51,7 @@ lspconfig.ts_ls.setup {
   init_options = {
     plugins = {
       {
-        name = '@vue/typescript-plugin',
+        name = '@azee/vue-typescript-plugin',
         location = vue_language_server_path,
         languages = { 'vue' },
       },
@@ -62,7 +64,7 @@ lspconfig.ts_ls.setup {
 lspconfig.volar.setup {}
 ```
 
-### Non-Hybrid mode(similar to takeover mode) configuration (Requires `@vue/language-server` version `^2.0.7`)
+### Non-Hybrid mode(similar to takeover mode) configuration (Requires `@azee/vue-language-server` version `^2.0.7`)
 
 Note: If `hybridMode` is set to `false` `Volar` will run embedded `ts_ls` therefore there is no need to run it separately.
 
@@ -93,8 +95,8 @@ lspconfig.ts_ls.setup {
   init_options = {
     plugins = {
       {
-        name = '@vue/typescript-plugin',
-        location = '/path/to/@vue/language-server',
+        name = '@azee/vue-typescript-plugin',
+        location = '/path/to/@azee/vue-language-server',
         languages = { 'vue' },
       },
     },
@@ -138,7 +140,7 @@ Check out this [discussion](https://github.com/vuejs/language-tools/discussions/
 *Vue language support for Monaco on Browser*
 
 [WebStorm](https://www.jetbrains.com/webstorm/) \
-*Built-in integration for `@vue/language-server`*
+*Built-in integration for `@azee/vue-language-server`*
 
 [Eclipse WildWebDeveloper](https://github.com/eclipse-wildwebdeveloper/wildwebdeveloper) \
 *Vue language server configuration for Eclipse*
