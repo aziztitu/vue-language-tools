@@ -23,7 +23,7 @@
 		"vscode-uri": "^3.0.8"
 	},
 	"peerDependencies": {
-		"typescript": "*"
+    "typescript": "^5.7.2"
 	},
 	"devDependencies": {
 		"@typescript/server-harness": "latest",
