@@ -1,33 +1,33 @@
 {
-	"name": "vue-component-meta",
-	"version": "2.2.10",
-	"license": "MIT",
-	"files": [
-		"**/*.js",
-		"**/*.d.ts"
-	],
-	"sideEffects": false,
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/vuejs/language-tools.git",
-		"directory": "packages/component-meta"
-	},
-	"dependencies": {
-		"@volar/typescript": "2.4.11",
-		"@vue/language-core": "2.2.10",
-		"path-browserify": "^1.0.1",
-		"vue-component-type-helpers": "2.2.10"
-	},
-	"peerDependencies": {
-		"typescript": "*"
-	},
-	"peerDependenciesMeta": {
-		"typescript": {
-			"optional": true
-		}
-	},
-	"devDependencies": {
-		"@types/node": "^22.10.4",
-		"@types/path-browserify": "^1.0.1"
-	}
+  "name": "@azee/vue-component-meta",
+  "version": "2.3.0",
+  "license": "MIT",
+  "files": [
+    "**/*.js",
+    "**/*.d.ts"
+  ],
+  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vuejs/language-tools.git",
+    "directory": "packages/component-meta"
+  },
+  "dependencies": {
+    "@azee/vue-component-type-helpers": "^2.3.0",
+    "@azee/vue-language-core": "^2.3.0",
+    "@volar/typescript": "2.4.11",
+    "path-browserify": "^1.0.1"
+  },
+  "peerDependencies": {
+    "typescript": "*"
+  },
+  "peerDependenciesMeta": {
+    "typescript": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.4",
+    "@types/path-browserify": "^1.0.1"
+  }
 }

@@ -35,6 +35,15 @@ importers:
 
   extensions/vscode:
     devDependencies:
+      '@azee/vue-language-core':
+        specifier: ^2.3.0
+        version: link:../../packages/language-core
+      '@azee/vue-language-server':
+        specifier: ^2.3.0
+        version: link:../../packages/language-server
+      '@azee/vue-typescript-plugin':
+        specifier: ^2.3.0
+        version: link:../../packages/typescript-plugin
       '@types/semver':
         specifier: ^7.5.3
         version: 7.5.8
@@ -47,15 +56,6 @@ importers:
       '@vscode/vsce':
         specifier: ^3.2.1
         version: 3.2.1
-      '@vue/language-core':
-        specifier: 2.2.10
-        version: link:../../packages/language-core
-      '@vue/language-server':
-        specifier: 2.2.10
-        version: link:../../packages/language-server
-      '@vue/typescript-plugin':
-        specifier: 2.2.10
-        version: link:../../packages/typescript-plugin
       esbuild:
         specifier: ^0.25.0
         version: 0.25.0
@@ -77,21 +77,21 @@ importers:
 
   packages/component-meta:
     dependencies:
+      '@azee/vue-component-type-helpers':
+        specifier: ^2.3.0
+        version: link:../component-type-helpers
+      '@azee/vue-language-core':
+        specifier: ^2.3.0
+        version: link:../language-core
       '@volar/typescript':
         specifier: 2.4.11
         version: 2.4.11
-      '@vue/language-core':
-        specifier: 2.2.10
-        version: link:../language-core
       path-browserify:
         specifier: ^1.0.1
         version: 1.0.1
       typescript:
         specifier: '*'
         version: 5.7.2
-      vue-component-type-helpers:
-        specifier: 2.2.10
-        version: link:../component-type-helpers
     devDependencies:
       '@types/node':
         specifier: ^22.10.4
@@ -157,15 +157,24 @@ importers:
         specifier: 0.0.62
         version: 0.0.62
     devDependencies:
+      '@azee/vue-language-core':
+        specifier: ^2.3.0
+        version: link:../language-core
       '@types/node':
         specifier: ^22.10.4
         version: 22.10.4
-      '@vue/language-core':
-        specifier: 2.2.10
-        version: link:../language-core
 
   packages/language-server:
     dependencies:
+      '@azee/vue-language-core':
+        specifier: ^2.3.0
+        version: link:../language-core
+      '@azee/vue-language-service':
+        specifier: ^2.3.0
+        version: link:../language-service
+      '@azee/vue-typescript-plugin':
+        specifier: ^2.3.0
+        version: link:../typescript-plugin
       '@volar/language-core':
         specifier: 2.4.11
         version: 2.4.11
@@ -175,15 +184,6 @@ importers:
       '@volar/test-utils':
         specifier: 2.4.11
         version: 2.4.11
-      '@vue/language-core':
-        specifier: 2.2.10
-        version: link:../language-core
-      '@vue/language-service':
-        specifier: 2.2.10
-        version: link:../language-service
-      '@vue/typescript-plugin':
-        specifier: 2.2.10
-        version: link:../typescript-plugin
       vscode-languageserver-protocol:
         specifier: ^3.17.5
         version: 3.17.5
@@ -193,6 +193,12 @@ importers:
 
   packages/language-service:
     dependencies:
+      '@azee/vue-language-core':
+        specifier: ^2.3.0
+        version: link:../language-core
+      '@azee/vue-typescript-plugin':
+        specifier: ^2.3.0
+        version: link:../typescript-plugin
       '@volar/language-core':
         specifier: 2.4.11
         version: 2.4.11
@@ -205,15 +211,9 @@ importers:
       '@vue/compiler-dom':
         specifier: ^3.5.0
         version: 3.5.13
-      '@vue/language-core':
-        specifier: 2.2.10
-        version: link:../language-core
       '@vue/shared':
         specifier: ^3.5.0
         version: 3.5.13
-      '@vue/typescript-plugin':
-        specifier: 2.2.10
-        version: link:../typescript-plugin
       alien-signals:
         specifier: ^1.0.3
         version: 1.0.3
@@ -272,12 +272,12 @@ importers:
 
   packages/tsc:
     dependencies:
+      '@azee/vue-language-core':
+        specifier: ^2.3.0
+        version: link:../language-core
       '@volar/typescript':
         specifier: 2.4.11
         version: 2.4.11
-      '@vue/language-core':
-        specifier: 2.2.10
-        version: link:../language-core
       typescript:
         specifier: '>=5.0.0'
         version: 5.7.2
@@ -288,12 +288,12 @@ importers:
 
   packages/typescript-plugin:
     dependencies:
+      '@azee/vue-language-core':
+        specifier: ^2.3.0
+        version: link:../language-core
       '@volar/typescript':
         specifier: 2.4.11
         version: 2.4.11
-      '@vue/language-core':
-        specifier: 2.2.10
-        version: link:../language-core
       '@vue/shared':
         specifier: ^3.5.0
         version: 3.5.13
@@ -304,6 +304,9 @@ importers:
 
   test-workspace:
     devDependencies:
+      '@azee/vue-component-type-helpers':
+        specifier: ^2.3.0
+        version: link:../packages/component-type-helpers
       typescript-next:
         specifier: npm:typescript@5.7.0-dev.20240926
         version: typescript@5.7.0-dev.20240926
@@ -313,9 +316,6 @@ importers:
       vue:
         specifier: ^3.5.0
         version: 3.5.13(typescript@5.7.2)
-      vue-component-type-helpers:
-        specifier: 2.2.10
-        version: link:../packages/component-type-helpers
       vue2:
         specifier: npm:vue@2.7.16
         version: vue@2.7.16
@@ -2084,11 +2084,13 @@ packages:
   git-raw-commits@4.0.0:
     resolution: {integrity: sha512-ICsMM1Wk8xSGMowkOmPrzo2Fgmfo4bMHLNX6ytHjajRJUqvHOw/TFapQ+QG75c3X/tTDDhOSRPGC52dDbNM8FQ==}
     engines: {node: '>=16'}
+    deprecated: This package is no longer maintained. For the JavaScript API, please use @conventional-changelog/git-client instead.
     hasBin: true
 
   git-semver-tags@7.0.1:
     resolution: {integrity: sha512-NY0ZHjJzyyNXHTDZmj+GG7PyuAKtMsyWSwh07CR2hOZFa+/yoTsXci/nF2obzL8UDhakFNkD9gNdt/Ed+cxh2Q==}
     engines: {node: '>=16'}
+    deprecated: This package is no longer maintained. For the JavaScript API, please use @conventional-changelog/git-client instead.
     hasBin: true
 
   git-up@8.0.0:
@@ -2110,11 +2112,13 @@ packages:
 
   glob@10.4.5:
     resolution: {integrity: sha512-7Bv8RF0k6xjo7d4A/PxYLbUCfb6c+Vpd2/mB2yRDlew7Jb5hEXiCD9ibfO7wpk8i4sevK6DFny9h7EYbM3/sHg==}
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
     hasBin: true
 
   glob@11.0.0:
     resolution: {integrity: sha512-9UiX/Bl6J2yaBbxKoEBRm4Cipxgok8kQYcOPEhScPwebu2I0HoQOuYdIO6S3hLuWoZgpDpwQZMzTFxgpkyT76g==}
     engines: {node: 20 || >=22}
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
     hasBin: true
 
   globals@14.0.0:
@@ -2657,6 +2661,7 @@ packages:
   node-domexception@1.0.0:
     resolution: {integrity: sha512-/jKZoMpw0F8GRwl4/eLROPA3cfcXtLApP0QzLmUT/HuPCZWyB7IY9ZrMeKw2O/nFIqPQB3PVM9aYm0F312AXDQ==}
     engines: {node: '>=10.5.0'}
+    deprecated: Use your platform's native DOMException instead
 
   node-fetch@3.3.2:
     resolution: {integrity: sha512-dRB78srN/l6gqWulah9SrxeYnxeddIG30+GOqK/9OlLVyLg3HPnr6SqOWTWOXKRwC2eGYCkZ59NNuSgvSrpgOA==}
@@ -2912,6 +2917,7 @@ packages:
   prebuild-install@7.1.2:
     resolution: {integrity: sha512-UnNke3IQb6sgarcZIDU3gbMeTp/9SSU1DAIkil7PrqG1vZlBtY5msYccSKSHDqa3hNg436IXK+SNImReuA1wEQ==}
     engines: {node: '>=10'}
+    deprecated: No longer maintained. Please contact the author of the relevant native addon; alternatives are available.
     hasBin: true
 
   prelude-ls@1.2.1:
@@ -3252,6 +3258,7 @@ packages:
   tar@6.2.1:
     resolution: {integrity: sha512-DZ4yORTwrbTj/7MZYq2w+/ZFdI6OZ/f9SFHR+71gIVUZhOQPHzVCLpvRnPgyaMpfWxxk/4ONva3GQSyNIKRv6A==}
     engines: {node: '>=10'}
+    deprecated: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
 
   temp-dir@3.0.0:
     resolution: {integrity: sha512-nHc6S/bwIilKHNRgK/3jlhDoIHcp45YgyiwcAk46Tr0LfEqGBVpmiAyuiuxeVE44m3mXnEeVhaipLOEWmH+Njw==}
@@ -3423,6 +3430,7 @@ packages:
 
   uuid@8.3.2:
     resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
+    deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
     hasBin: true
 
   validate-npm-package-license@3.0.4:
@@ -3634,6 +3642,7 @@ packages:
   whatwg-encoding@3.1.1:
     resolution: {integrity: sha512-6qN4hJdMwfYBtE3YBTTHhoeuUrDBPZmbQaxWAqSALV/MeEnR5z1xd8UKud2RAkFoPkmB+hli1TZSnyi84xz1vQ==}
     engines: {node: '>=18'}
+    deprecated: Use @exodus/bytes instead for a more spec-conformant and faster implementation
 
   whatwg-mimetype@4.0.0:
     resolution: {integrity: sha512-QaKxh0eNIi2mE9p2vEdzfagOKHCcj1pJ56EEHGQOVxp8r9/iszLUUV7v89x9O1p/T+NlTM5W7jW6+cz4Fq1YVg==}
