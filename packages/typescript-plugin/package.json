@@ -1,6 +1,6 @@
 {
   "name": "@azee/vue-typescript-plugin",
-  "version": "2.3.5",
+  "version": "2.3.6",
   "license": "MIT",
   "files": [
     "**/*.js",
@@ -13,7 +13,7 @@
     "directory": "packages/typescript-plugin"
   },
   "dependencies": {
-    "@azee/vue-language-core": "2.3.5",
+    "@azee/vue-language-core": "2.3.6",
     "@volar/typescript": "2.4.11",
     "@vue/shared": "^3.5.0"
   },

@@ -1,6 +1,6 @@
 {
   "name": "@azee/vue-tsc",
-  "version": "2.3.5",
+  "version": "2.3.6",
   "license": "MIT",
   "files": [
     "bin",
@@ -20,7 +20,7 @@
     "typescript": ">=5.0.0"
   },
   "dependencies": {
-    "@azee/vue-language-core": "2.3.5",
+    "@azee/vue-language-core": "2.3.6",
     "@volar/typescript": "2.4.11"
   },
   "devDependencies": {
