@@ -3,10 +3,8 @@ import type { VueLanguagePlugin } from '../types';
 import { allCodeFeatures } from './shared';
 
 const plugin: VueLanguagePlugin = () => {
-
 	return {
-
-		version: 2.1,
+		version: 2.2,
 
 		getEmbeddedCodes() {
 			return [{
@@ -18,24 +16,19 @@ const plugin: VueLanguagePlugin = () => {
 		resolveEmbeddedCode(_fileName, sfc, embeddedFile) {
 			if (embeddedFile.id === 'root_tags') {
 				embeddedFile.content.push([sfc.content, undefined, 0, allCodeFeatures]);
-				for (const block of [
-					sfc.script,
-					sfc.scriptSetup,
-					sfc.template,
-					...sfc.styles,
-					...sfc.customBlocks,
-				]) {
+				for (
+					const block of [
+						sfc.template,
+						sfc.script,
+						sfc.scriptSetup,
+						...sfc.styles,
+						...sfc.customBlocks,
+					]
+				) {
 					if (!block) {
 						continue;
 					}
-					let content = block.content;
-					if (content.endsWith('\r\n')) {
-						content = content.slice(0, -2);
-					}
-					else if (content.endsWith('\n')) {
-						content = content.slice(0, -1);
-					}
-					const offset = content.lastIndexOf('\n') + 1;
+					const offset = block.content.lastIndexOf('\n', block.content.lastIndexOf('\n') - 1) + 1;
 					// fix folding range end position failed to mapping
 					replaceSourceRange(
 						embeddedFile.content,
@@ -44,7 +37,7 @@ const plugin: VueLanguagePlugin = () => {
 						block.endTagStart,
 						sfc.content.slice(
 							block.startTagEnd,
-							block.startTagEnd + offset
+							block.startTagEnd + offset,
 						),
 						[
 							'',
@@ -54,8 +47,8 @@ const plugin: VueLanguagePlugin = () => {
 						],
 						sfc.content.slice(
 							block.startTagEnd + offset,
-							block.endTagStart
-						)
+							block.endTagStart,
+						),
 					);
 				}
 			}

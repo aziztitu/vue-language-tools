@@ -1,9 +1,9 @@
-import type { CreateFile, LanguageServiceContext, LanguageServicePlugin, TextDocumentEdit, TextEdit } from '@volar/language-service';
+import type { CreateFile, LanguageServicePlugin, TextDocumentEdit, TextEdit } from '@volar/language-service';
 import type { ExpressionNode, TemplateChildNode } from '@vue/compiler-dom';
-import { Sfc, VueVirtualCode, tsCodegen } from '@vue/language-core';
+import { type Sfc, tsCodegen } from '@vue/language-core';
 import type * as ts from 'typescript';
-import type * as vscode from 'vscode-languageserver-protocol';
 import { URI } from 'vscode-uri';
+import { resolveEmbeddedCode } from '../utils';
 
 interface ActionData {
 	uri: string;
@@ -15,7 +15,7 @@ const unicodeReg = /\\u/g;
 
 export function create(
 	ts: typeof import('typescript'),
-	getTsPluginClient?: (context: LanguageServiceContext) => typeof import('@vue/typescript-plugin/lib/client') | undefined
+	{ collectExtractProps }: import('@vue/typescript-plugin/lib/requests').Requests,
 ): LanguageServicePlugin {
 	return {
 		name: 'vue-extract-file',
@@ -26,10 +26,8 @@ export function create(
 			},
 		},
 		create(context) {
-			const tsPluginClient = getTsPluginClient?.(context);
 			return {
 				provideCodeActions(document, range, ctx) {
-
 					if (ctx.only && !ctx.only.includes('refactor')) {
 						return;
 					}
@@ -40,20 +38,12 @@ export function create(
 						return;
 					}
 
-					const uri = URI.parse(document.uri);
-					const decoded = context.decodeEmbeddedDocumentUri(uri);
-					const sourceScript = decoded && context.language.scripts.get(decoded[0]);
-					const virtualCode = decoded && sourceScript?.generated?.embeddedCodes.get(decoded[1]);
-					if (!sourceScript?.generated || virtualCode?.id !== 'template') {
+					const info = resolveEmbeddedCode(context, document.uri);
+					if (info?.code.id !== 'template') {
 						return;
 					}
 
-					const root = sourceScript.generated.root;
-					if (!(root instanceof VueVirtualCode)) {
-						return;
-					}
-
-					const { sfc } = root;
+					const { sfc } = info.root;
 					const script = sfc.scriptSetup ?? sfc.script;
 					if (!sfc.template || !script) {
 						return;
@@ -78,24 +68,15 @@ export function create(
 				},
 
 				async resolveCodeAction(codeAction) {
-
 					const { uri, range, newName } = codeAction.data as ActionData;
 					const [startOffset, endOffset]: [number, number] = range;
 
-					const parsedUri = URI.parse(uri);
-					const decoded = context.decodeEmbeddedDocumentUri(parsedUri);
-					const sourceScript = decoded && context.language.scripts.get(decoded[0]);
-					const virtualCode = decoded && sourceScript?.generated?.embeddedCodes.get(decoded[1]);
-					if (!sourceScript?.generated || virtualCode?.id !== 'template') {
+					const info = resolveEmbeddedCode(context, uri);
+					if (info?.code.id !== 'template') {
 						return codeAction;
 					}
 
-					const root = sourceScript.generated.root;
-					if (!(root instanceof VueVirtualCode)) {
-						return codeAction;
-					}
-
-					const { sfc } = root;
+					const { sfc } = info.root;
 					const script = sfc.scriptSetup ?? sfc.script;
 					if (!sfc.template || !script) {
 						return codeAction;
@@ -106,35 +87,39 @@ export function create(
 						return codeAction;
 					}
 
-					const toExtract = await tsPluginClient?.collectExtractProps(root.fileName, templateCodeRange) ?? [];
-					if (!toExtract) {
-						return codeAction;
-					}
+					const toExtract = await collectExtractProps(info.root.fileName, templateCodeRange) ?? [];
 
-					const templateInitialIndent = await context.env.getConfiguration!<boolean>('vue.format.template.initialIndent') ?? true;
-					const scriptInitialIndent = await context.env.getConfiguration!<boolean>('vue.format.script.initialIndent') ?? false;
+					const templateInitialIndent =
+						await context.env.getConfiguration!<boolean>('vue.format.template.initialIndent') ?? true;
+					const scriptInitialIndent = await context.env.getConfiguration!<boolean>('vue.format.script.initialIndent')
+						?? false;
 
-					const document = context.documents.get(parsedUri, virtualCode.languageId, virtualCode.snapshot);
-					const sfcDocument = context.documents.get(sourceScript.id, sourceScript.languageId, sourceScript.snapshot);
+					const document = context.documents.get(URI.parse(uri), info.code.languageId, info.code.snapshot);
+					const sfcDocument = context.documents.get(info.script.id, info.script.languageId, info.script.snapshot);
 					const newUri = sfcDocument.uri.slice(0, sfcDocument.uri.lastIndexOf('/') + 1) + `${newName}.vue`;
 					const lastImportNode = getLastImportNode(ts, script.ast);
 
 					let newFileTags = [];
 
 					newFileTags.push(
-						constructTag('template', [], templateInitialIndent, sfc.template.content.slice(templateCodeRange[0], templateCodeRange[1]))
+						constructTag(
+							'template',
+							[],
+							templateInitialIndent,
+							sfc.template.content.slice(templateCodeRange[0], templateCodeRange[1]),
+						),
 					);
 
 					if (toExtract.length) {
 						newFileTags.push(
-							constructTag('script', ['setup', 'lang="ts"'], scriptInitialIndent, generateNewScriptContents())
+							constructTag('script', ['setup', 'lang="ts"'], scriptInitialIndent, generateNewScriptContents()),
 						);
 					}
 					if (sfc.template.startTagEnd > script.startTagEnd) {
 						newFileTags = newFileTags.reverse();
 					}
 
-					const templateEdits: vscode.TextEdit[] = [
+					const templateEdits: TextEdit[] = [
 						{
 							range: {
 								start: document.positionAt(templateCodeRange[0]),
@@ -144,15 +129,17 @@ export function create(
 						},
 					];
 
-					const sfcEdits: vscode.TextEdit[] = [
+					const sfcEdits: TextEdit[] = [
 						{
-							range: lastImportNode ? {
-								start: sfcDocument.positionAt(script.startTagEnd + lastImportNode.end),
-								end: sfcDocument.positionAt(script.startTagEnd + lastImportNode.end),
-							} : {
-								start: sfcDocument.positionAt(script.startTagEnd),
-								end: sfcDocument.positionAt(script.startTagEnd),
-							},
+							range: lastImportNode
+								? {
+									start: sfcDocument.positionAt(script.startTagEnd + lastImportNode.end),
+									end: sfcDocument.positionAt(script.startTagEnd + lastImportNode.end),
+								}
+								: {
+									start: sfcDocument.positionAt(script.startTagEnd),
+									end: sfcDocument.positionAt(script.startTagEnd),
+								},
 							newText: `\nimport ${newName} from './${newName}.vue'`,
 						},
 					];
@@ -186,7 +173,7 @@ export function create(
 								// editing vue sfc
 								{
 									textDocument: {
-										uri: sourceScript.id.toString(),
+										uri: info.script.id.toString(),
 										version: null,
 									},
 									edits: sfcEdits,
@@ -221,7 +208,7 @@ export function create(
 						const props = toExtract.filter(p => !p.model);
 						const models = toExtract.filter(p => p.model);
 						if (props.length) {
-							lines.push(`defineProps<{ \n\t${props.map(p => `${p.name}: ${p.type};`).join('\n\t')}\n}>()`);
+							lines.push(`defineProps<{\n\t${props.map(p => `${p.name}: ${p.type};`).join('\n\t')}\n}>()`);
 						}
 						for (const model of models) {
 							lines.push(`const ${model.name} = defineModel<${model.type}>('${model.name}', { required: true })`);
@@ -245,8 +232,11 @@ export function create(
 	};
 }
 
-function selectTemplateCode(startOffset: number, endOffset: number, templateBlock: NonNullable<Sfc['template']>): [number, number] | undefined {
-
+function selectTemplateCode(
+	startOffset: number,
+	endOffset: number,
+	templateBlock: NonNullable<Sfc['template']>,
+): [number, number] | undefined {
 	const insideNodes: (TemplateChildNode | ExpressionNode)[] = [];
 
 	templateBlock.ast?.children.forEach(function visit(node: TemplateChildNode | ExpressionNode) {
@@ -274,8 +264,8 @@ function selectTemplateCode(startOffset: number, endOffset: number, templateBloc
 	});
 
 	if (insideNodes.length) {
-		const first = insideNodes.sort((a, b) => a.loc.start.offset - b.loc.start.offset)[0];
-		const last = insideNodes.sort((a, b) => b.loc.end.offset - a.loc.end.offset)[0];
+		const first = insideNodes.sort((a, b) => a.loc.start.offset - b.loc.start.offset)[0]!;
+		const last = insideNodes.sort((a, b) => b.loc.end.offset - a.loc.end.offset)[0]!;
 		return [first.loc.start.offset, last.loc.end.offset];
 	}
 }
@@ -289,7 +279,6 @@ function constructTag(name: string, attributes: string[], initialIndent: boolean
 }
 
 export function getLastImportNode(ts: typeof import('typescript'), sourceFile: ts.SourceFile) {
-
 	let lastImportNode: ts.Node | undefined;
 
 	for (const statement of sourceFile.statements) {
@@ -304,8 +293,12 @@ export function getLastImportNode(ts: typeof import('typescript'), sourceFile: t
 	return lastImportNode;
 }
 
-export function createAddComponentToOptionEdit(ts: typeof import('typescript'), sfc: Sfc, ast: ts.SourceFile, componentName: string) {
-
+export function createAddComponentToOptionEdit(
+	ts: typeof import('typescript'),
+	sfc: Sfc,
+	ast: ts.SourceFile,
+	componentName: string,
+) {
 	const scriptRanges = tsCodegen.get(sfc)?.getScriptRanges();
 	if (!scriptRanges?.exportDefault) {
 		return;
@@ -328,7 +321,7 @@ export function createAddComponentToOptionEdit(ts: typeof import('typescript'), 
 			newText: unescape(printText.replace(unicodeReg, '%u')),
 		};
 	}
-	else if (exportDefault.args && exportDefault.argsNode) {
+	else {
 		const newNode: typeof exportDefault.argsNode = {
 			...exportDefault.argsNode,
 			properties: [

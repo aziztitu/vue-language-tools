@@ -1,15 +1,16 @@
-import { VueVirtualCode, forEachEmbeddedCode } from '@vue/language-core';
+import type { InsertTextFormat, LanguageServicePlugin, WorkspaceEdit } from '@volar/language-service';
+import { forEachEmbeddedCode } from '@vue/language-core';
 import { camelize, capitalize, hyphenate } from '@vue/shared';
 import { posix as path } from 'path-browserify';
 import { getUserPreferences } from 'volar-service-typescript/lib/configs/getUserPreferences';
-import type * as vscode from 'vscode-languageserver-protocol';
 import { URI } from 'vscode-uri';
+import { checkCasing, TagNameCasing } from '../nameCasing';
 import { createAddComponentToOptionEdit, getLastImportNode } from '../plugins/vue-extract-file';
-import { LanguageServiceContext, LanguageServicePlugin, TagNameCasing } from '../types';
+import { resolveEmbeddedCode } from '../utils';
 
 export function create(
 	ts: typeof import('typescript'),
-	getTsPluginClient?: (context: LanguageServiceContext) => typeof import('@vue/typescript-plugin/lib/client') | undefined
+	{ getImportPathForFile }: import('@vue/typescript-plugin/lib/requests').Requests,
 ): LanguageServicePlugin {
 	return {
 		name: 'vue-document-drop',
@@ -17,31 +18,13 @@ export function create(
 			documentDropEditsProvider: true,
 		},
 		create(context) {
-			if (!context.project.vue) {
-				return {};
-			}
-
-			let casing = TagNameCasing.Pascal as TagNameCasing; // TODO
-
-			const tsPluginClient = getTsPluginClient?.(context);
-			const vueCompilerOptions = context.project.vue.compilerOptions;
-
 			return {
 				async provideDocumentDropEdits(document, _position, dataTransfer) {
-
 					if (document.languageId !== 'html') {
 						return;
 					}
-
-					const uri = URI.parse(document.uri);
-					const decoded = context.decodeEmbeddedDocumentUri(uri);
-					const sourceScript = decoded && context.language.scripts.get(decoded[0]);
-					if (!sourceScript?.generated) {
-						return;
-					}
-
-					const root = sourceScript.generated.root;
-					if (!(root instanceof VueVirtualCode)) {
+					const info = resolveEmbeddedCode(context, document.uri);
+					if (info?.code.id !== 'template') {
 						return;
 					}
 
@@ -51,41 +34,47 @@ export function create(
 							importUri = item.value as string;
 						}
 					}
-					if (!importUri || !vueCompilerOptions.extensions.some(ext => importUri.endsWith(ext))) {
+					if (!importUri || !info.root.vueCompilerOptions.extensions.some(ext => importUri.endsWith(ext))) {
 						return;
 					}
 
-					const { sfc } = root;
+					const { sfc } = info.root;
 					const script = sfc.scriptSetup ?? sfc.script;
 					if (!script) {
 						return;
 					}
 
-					let baseName = importUri.slice(importUri.lastIndexOf('/') + 1);
-					baseName = baseName.slice(0, baseName.lastIndexOf('.'));
-					const newName = capitalize(camelize(baseName));
+					const casing = await checkCasing(context, info.script.id);
+					const baseName = path.basename(importUri);
+					const newName = capitalize(camelize(baseName.slice(0, baseName.lastIndexOf('.'))));
 
-					const additionalEdit: vscode.WorkspaceEdit = {};
-					const code = [...forEachEmbeddedCode(root)].find(code => code.id === (sfc.scriptSetup ? 'scriptsetup_raw' : 'script_raw'))!;
+					const additionalEdit: WorkspaceEdit = {};
+					const code = [...forEachEmbeddedCode(info.root)].find(code =>
+						code.id === (sfc.scriptSetup ? 'scriptsetup_raw' : 'script_raw')
+					)!;
 					const lastImportNode = getLastImportNode(ts, script.ast);
-					const incomingFileName = context.project.typescript?.uriConverter.asFileName(URI.parse(importUri))
-						?? URI.parse(importUri).fsPath.replace(/\\/g, '/');
+					const incomingFileName = URI.parse(importUri).fsPath.replace(/\\/g, '/');
 
-					let importPath: string | undefined;
+					let importPath: string | null | undefined;
 
-					const serviceScript = sourceScript.generated?.languagePlugin.typescript?.getServiceScript(root);
-					if (tsPluginClient && serviceScript) {
-						const tsDocumentUri = context.encodeEmbeddedDocumentUri(sourceScript.id, serviceScript.code.id);
-						const tsDocument = context.documents.get(tsDocumentUri, serviceScript.code.languageId, serviceScript.code.snapshot);
+					const serviceScript = info.script.generated.languagePlugin.typescript?.getServiceScript(info.root);
+					if (serviceScript) {
+						const tsDocumentUri = context.encodeEmbeddedDocumentUri(info.script.id, serviceScript.code.id);
+						const tsDocument = context.documents.get(
+							tsDocumentUri,
+							serviceScript.code.languageId,
+							serviceScript.code.snapshot,
+						);
 						const preferences = await getUserPreferences(context, tsDocument);
-						const importPathRequest = await tsPluginClient.getImportPathForFile(root.fileName, incomingFileName, preferences);
-						if (importPathRequest) {
-							importPath = importPathRequest;
-						}
+						importPath = await getImportPathForFile(
+							info.root.fileName,
+							incomingFileName,
+							preferences,
+						);
 					}
 
 					if (!importPath) {
-						importPath = path.relative(path.dirname(root.fileName), incomingFileName)
+						importPath = path.relative(path.dirname(info.root.fileName), incomingFileName)
 							|| importUri.slice(importUri.lastIndexOf('/') + 1);
 
 						if (!importPath.startsWith('./') && !importPath.startsWith('../')) {
@@ -93,18 +82,20 @@ export function create(
 						}
 					}
 
-					const embeddedDocumentUriStr = context.encodeEmbeddedDocumentUri(sourceScript.id, code.id).toString();
+					const embeddedDocumentUriStr = context.encodeEmbeddedDocumentUri(info.script.id, code.id).toString();
 
 					additionalEdit.changes ??= {};
 					additionalEdit.changes[embeddedDocumentUriStr] = [];
 					additionalEdit.changes[embeddedDocumentUriStr].push({
-						range: lastImportNode ? {
-							start: script.ast.getLineAndCharacterOfPosition(lastImportNode.end),
-							end: script.ast.getLineAndCharacterOfPosition(lastImportNode.end),
-						} : {
-							start: script.ast.getLineAndCharacterOfPosition(0),
-							end: script.ast.getLineAndCharacterOfPosition(0),
-						},
+						range: lastImportNode
+							? {
+								start: script.ast.getLineAndCharacterOfPosition(lastImportNode.end),
+								end: script.ast.getLineAndCharacterOfPosition(lastImportNode.end),
+							}
+							: {
+								start: script.ast.getLineAndCharacterOfPosition(0),
+								end: script.ast.getLineAndCharacterOfPosition(0),
+							},
 						newText: `\nimport ${newName} from '${importPath}'`
 							+ (lastImportNode ? '' : '\n'),
 					});
@@ -123,8 +114,8 @@ export function create(
 					}
 
 					return {
-						insertText: `<${casing === TagNameCasing.Kebab ? hyphenate(newName) : newName}$0 />`,
-						insertTextFormat: 2 satisfies typeof vscode.InsertTextFormat.Snippet,
+						insertText: `<${casing.tag === TagNameCasing.Kebab ? hyphenate(newName) : newName}$0 />`,
+						insertTextFormat: 2 satisfies typeof InsertTextFormat.Snippet,
 						additionalEdit,
 					};
 				},

@@ -20,9 +20,6 @@ const ScriptSetupExact = defineComponent({
 		'update:f': [f: string | undefined];
 		'update:gG': [g: string | undefined];
 	},
-	setup() {
-		return {};
-	},
 });
 
 exactType(ScriptSetup, ScriptSetupExact);

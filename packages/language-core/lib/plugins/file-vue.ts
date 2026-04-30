@@ -2,10 +2,8 @@ import type { VueLanguagePlugin } from '../types';
 import { parse } from '../utils/parseSfc';
 
 const plugin: VueLanguagePlugin = ({ vueCompilerOptions }) => {
-
 	return {
-
-		version: 2.1,
+		version: 2.2,
 
 		getLanguageId(fileName) {
 			if (vueCompilerOptions.extensions.some(ext => fileName.endsWith(ext))) {
@@ -21,11 +19,27 @@ const plugin: VueLanguagePlugin = ({ vueCompilerOptions }) => {
 			if (languageId !== 'vue') {
 				return;
 			}
-			return parse(content);
+			const sfc = parse(content);
+			for (const error of sfc.errors) {
+				// Handle 'Element is missing end tag.' error, see #4893
+				if (
+					'code' in error && error.code === 24 && sfc.descriptor.template
+					&& error.loc?.start.line === sfc.descriptor.template.loc.start.line
+				) {
+					const template = sfc.descriptor.template;
+					const templateText = template.content;
+					const endTagOffset = templateText.lastIndexOf('<');
+					const endTagText = templateText.slice(endTagOffset).trimEnd();
+					if ('</template>'.startsWith(endTagText)) {
+						sfc.descriptor.template.loc.end.offset = template.loc.start.offset + endTagOffset;
+						template.content = templateText.slice(0, endTagOffset);
+					}
+				}
+			}
+			return sfc;
 		},
 
 		updateSFC(sfc, change) {
-
 			const blocks = [
 				sfc.descriptor.template,
 				sfc.descriptor.script,
@@ -34,14 +48,15 @@ const plugin: VueLanguagePlugin = ({ vueCompilerOptions }) => {
 				...sfc.descriptor.customBlocks,
 			].filter(block => !!block);
 
-			const hitBlock = blocks.find(block => change.start >= block.loc.start.offset && change.end <= block.loc.end.offset);
+			const hitBlock = blocks.find(block =>
+				change.start >= block.loc.start.offset && change.end <= block.loc.end.offset
+			);
 			if (!hitBlock) {
 				return;
 			}
 
 			const oldContent = hitBlock.content;
-			const newContent = hitBlock.content =
-				hitBlock.content.slice(0, change.start - hitBlock.loc.start.offset)
+			const newContent = hitBlock.content = hitBlock.content.slice(0, change.start - hitBlock.loc.start.offset)
 				+ change.newText
 				+ hitBlock.content.slice(change.end - hitBlock.loc.start.offset);
 

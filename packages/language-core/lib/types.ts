@@ -9,9 +9,10 @@ export type { SFCParseResult } from '@vue/compiler-sfc';
 
 export { VueEmbeddedCode };
 
-export type RawVueCompilerOptions = Partial<Omit<VueCompilerOptions, 'target' | 'plugins'>> & {
+export type RawVueCompilerOptions = Partial<Omit<VueCompilerOptions, 'target' | 'globalTypesPath' | 'plugins'>> & {
 	strictTemplates?: boolean;
-	target?: 'auto' | 2 | 2.7 | 3 | 3.3 | 3.5 | 99 | number;
+	target?: 'auto' | 2 | 2.7 | 3 | 3.3 | 3.5 | 3.6 | 99 | number;
+	globalTypesPath?: string;
 	plugins?: string[];
 };
 
@@ -25,10 +26,13 @@ export type Code = Segment<VueCodeInformation>;
 export interface VueCompilerOptions {
 	target: number;
 	lib: string;
+	globalTypesPath: (fileName: string) => string | void;
 	extensions: string[];
 	vitePressExtensions: string[];
 	petiteVueExtensions: string[];
 	jsxSlots: boolean;
+	strictVModel: boolean;
+	strictCssModules: boolean;
 	checkUnknownProps: boolean;
 	checkUnknownEvents: boolean;
 	checkUnknownDirectives: boolean;
@@ -41,6 +45,8 @@ export interface VueCompilerOptions {
 	inferTemplateDollarSlots: boolean;
 	skipTemplateCodegen: boolean;
 	fallthroughAttributes: boolean;
+	resolveStyleImports: boolean;
+	resolveStyleClassNames: boolean | 'scoped';
 	fallthroughComponentNames: string[];
 	dataAttributes: string[];
 	htmlAttributes: string[];
@@ -63,18 +69,13 @@ export interface VueCompilerOptions {
 	plugins: VueLanguagePlugin[];
 
 	// experimental
-	experimentalDefinePropProposal: 'kevinEdition' | 'johnsonEdition' | false;
-	experimentalResolveStyleCssClasses: 'scoped' | 'always' | 'never';
-	experimentalModelPropName: Record<string, Record<string, boolean | Record<string, string> | Record<string, string>[]>>;
-
-	// internal
-	__setupedGlobalTypes?: true | {
-		absolutePath: string;
-	};
-	__test?: boolean;
+	experimentalModelPropName: Record<
+		string,
+		Record<string, boolean | Record<string, string> | Record<string, string>[]>
+	>;
 }
 
-export const validVersions = [2, 2.1] as const;
+export const validVersions = [2, 2.1, 2.2] as const;
 
 export type VueLanguagePluginReturn = {
 	version: typeof validVersions[number];
@@ -85,12 +86,25 @@ export type VueLanguagePluginReturn = {
 	isValidFile?(fileName: string, languageId: string): boolean;
 	parseSFC?(fileName: string, content: string): SFCParseResult | undefined;
 	parseSFC2?(fileName: string, languageId: string, content: string): SFCParseResult | undefined;
-	updateSFC?(oldResult: SFCParseResult, textChange: { start: number, end: number, newText: string; }): SFCParseResult | undefined;
+	updateSFC?(
+		oldResult: SFCParseResult,
+		textChange: { start: number; end: number; newText: string },
+	): SFCParseResult | undefined;
 	resolveTemplateCompilerOptions?(options: CompilerDOM.CompilerOptions): CompilerDOM.CompilerOptions;
 	compileSFCScript?(lang: string, script: string): ts.SourceFile | undefined;
-	compileSFCTemplate?(lang: string, template: string, options: CompilerDOM.CompilerOptions): CompilerDOM.CodegenResult | undefined;
-	updateSFCTemplate?(oldResult: CompilerDOM.CodegenResult, textChange: { start: number, end: number, newText: string; }): CompilerDOM.CodegenResult | undefined;
-	getEmbeddedCodes?(fileName: string, sfc: Sfc): { id: string; lang: string; }[];
+	compileSFCTemplate?(
+		lang: string,
+		template: string,
+		options: CompilerDOM.CompilerOptions,
+	): CompilerDOM.CodegenResult | undefined;
+	compileSFCStyle?(lang: string, style: string):
+		| Pick<Sfc['styles'][number], 'imports' | 'bindings' | 'classNames'>
+		| undefined;
+	updateSFCTemplate?(
+		oldResult: CompilerDOM.CodegenResult,
+		textChange: { start: number; end: number; newText: string },
+	): CompilerDOM.CodegenResult | undefined;
+	getEmbeddedCodes?(fileName: string, sfc: Sfc): { id: string; lang: string }[];
 	resolveEmbeddedCode?(fileName: string, sfc: Sfc, embeddedFile: VueEmbeddedCode): void;
 };
 
@@ -123,24 +137,35 @@ export type SfcBlockAttr = true | {
 export interface Sfc {
 	content: string;
 	comments: string[];
-	template: SfcBlock & {
-		ast: CompilerDOM.RootNode | undefined;
-		errors: CompilerDOM.CompilerError[];
-		warnings: CompilerDOM.CompilerError[];
-	} | undefined;
-	script: (SfcBlock & {
-		src: SfcBlockAttr | undefined;
-		ast: ts.SourceFile;
-	}) | undefined;
-	scriptSetup: SfcBlock & {
-		// https://github.com/vuejs/rfcs/discussions/436
-		generic: SfcBlockAttr | undefined;
-		ast: ts.SourceFile;
-	} | undefined;
+	template:
+		| SfcBlock & {
+			ast: CompilerDOM.RootNode | undefined;
+			errors: CompilerDOM.CompilerError[];
+			warnings: CompilerDOM.CompilerError[];
+		}
+		| undefined;
+	script:
+		| (SfcBlock & {
+			src: SfcBlockAttr | undefined;
+			ast: ts.SourceFile;
+		})
+		| undefined;
+	scriptSetup:
+		| SfcBlock & {
+			// https://github.com/vuejs/rfcs/discussions/436
+			generic: SfcBlockAttr | undefined;
+			ast: ts.SourceFile;
+		}
+		| undefined;
 	styles: readonly (SfcBlock & {
+		src: SfcBlockAttr | undefined;
+		module: SfcBlockAttr | undefined;
 		scoped: boolean;
-		module?: SfcBlockAttr | undefined;
-		cssVars: {
+		imports: {
+			text: string;
+			offset: number;
+		}[];
+		bindings: {
 			text: string;
 			offset: number;
 		}[];

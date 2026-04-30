@@ -1,13 +1,11 @@
-import type { LanguageServiceContext, LanguageServicePlugin } from '@volar/language-service';
-import { hyphenateAttr, VueVirtualCode } from '@vue/language-core';
+import type { LanguageServicePlugin, TextDocument } from '@volar/language-service';
+import { hyphenateAttr } from '@vue/language-core';
 import type * as ts from 'typescript';
-import type { TextDocument } from 'vscode-languageserver-textdocument';
-import { URI } from 'vscode-uri';
-import { isTsDocument, sleep } from './utils';
+import { resolveEmbeddedCode } from '../utils';
 
 export function create(
 	ts: typeof import('typescript'),
-	getTsPluginClient?: (context: LanguageServiceContext) => typeof import('@vue/typescript-plugin/lib/client') | undefined
+	{ isRefAtPosition }: import('@vue/typescript-plugin/lib/requests').Requests,
 ): LanguageServicePlugin {
 	return {
 		name: 'vue-autoinsert-dotvalue',
@@ -18,16 +16,15 @@ export function create(
 			},
 		},
 		create(context) {
-			const tsPluginClient = getTsPluginClient?.(context);
-			let currentReq = 0;
 			return {
 				async provideAutoInsertSnippet(document, selection, change) {
-					// selection must at end of change
-					if (document.offsetAt(selection) !== change.rangeOffset + change.text.length) {
+					const info = resolveEmbeddedCode(context, document.uri);
+					if (!info?.code.id.startsWith('script_')) {
 						return;
 					}
 
-					if (!isTsDocument(document)) {
+					// selection must at end of change
+					if (document.offsetAt(selection) !== change.rangeOffset + change.text.length) {
 						return;
 					}
 
@@ -35,64 +32,35 @@ export function create(
 						return;
 					}
 
-					const req = ++currentReq;
-					// Wait for tsserver to sync
-					await sleep(250);
-					if (req !== currentReq) {
+					let sourceOffset: number | undefined;
+
+					const { sfc } = info.root;
+					const scriptBlocks = [sfc.script, sfc.scriptSetup].filter(block => !!block);
+					const map = context.language.maps.get(info.code, info.script);
+
+					if (!scriptBlocks.length) {
 						return;
 					}
 
-					const enabled = await context.env.getConfiguration?.<boolean>('vue.autoInsert.dotValue') ?? true;
-					if (!enabled) {
+					for (const [offset] of map.toSourceLocation(document.offsetAt(selection))) {
+						sourceOffset = offset;
+						break;
+					}
+
+					if (sourceOffset === undefined) {
 						return;
 					}
 
-					const uri = URI.parse(document.uri);
-					const decoded = context.decodeEmbeddedDocumentUri(uri);
-					const sourceScript = decoded && context.language.scripts.get(decoded[0]);
-					const virtualCode = decoded && sourceScript?.generated?.embeddedCodes.get(decoded[1]);
-					if (!sourceScript?.generated || !virtualCode) {
-						return;
-					}
-
-					const root = sourceScript.generated.root;
-					if (!(root instanceof VueVirtualCode)) {
-						return;
-					}
-
-					const { sfc } = root;
-					const blocks = [sfc.script, sfc.scriptSetup].filter(block => !!block);
-					if (!blocks.length) {
-						return;
-					}
-
-					let sourceCodeOffset = document.offsetAt(selection);
-					let mapped = false;
-					for (const [, map] of context.language.maps.forEach(virtualCode)) {
-						for (const [sourceOffset] of map.toSourceLocation(sourceCodeOffset)) {
-							sourceCodeOffset = sourceOffset;
-							mapped = true;
-							break;
-						}
-						if (mapped) {
-							break;
-						}
-					}
-					if (!mapped) {
-						return;
-					}
-
-					for (const { ast, startTagEnd, endTagStart } of blocks) {
-						if (sourceCodeOffset < startTagEnd || sourceCodeOffset > endTagStart) {
+					for (const { ast, startTagEnd, endTagStart } of scriptBlocks) {
+						if (sourceOffset < startTagEnd || sourceOffset > endTagStart) {
 							continue;
 						}
-						if (isBlacklistNode(ts, ast, sourceCodeOffset - startTagEnd, false)) {
+						if (isBlacklistNode(ts, ast, sourceOffset - startTagEnd, false)) {
 							return;
 						}
 					}
 
-					const props = await tsPluginClient?.getPropertiesAtLocation(root.fileName, sourceCodeOffset) ?? [];
-					if (props.some(prop => prop === 'value')) {
+					if (await isRefAtPosition(info.root.fileName, sourceOffset)) {
 						return '${1:.value}';
 					}
 				},
@@ -103,11 +71,11 @@ export function create(
 
 const charReg = /\w/;
 
-function isCharacterTyping(document: TextDocument, change: { text: string; rangeOffset: number; rangeLength: number; }) {
+function isCharacterTyping(document: TextDocument, change: { text: string; rangeOffset: number; rangeLength: number }) {
 	const lastCharacter = change.text[change.text.length - 1];
 	const nextCharacter = document.getText().slice(
 		change.rangeOffset + change.text.length,
-		change.rangeOffset + change.text.length + 1
+		change.rangeOffset + change.text.length + 1,
 	);
 	if (lastCharacter === undefined) { // delete text
 		return false;
@@ -122,7 +90,9 @@ function isBlacklistNode(ts: typeof import('typescript'), node: ts.Node, pos: nu
 	if (ts.isVariableDeclaration(node) && pos >= node.name.getFullStart() && pos <= node.name.getEnd()) {
 		return true;
 	}
-	else if (ts.isFunctionDeclaration(node) && node.name && pos >= node.name.getFullStart() && pos <= node.name.getEnd()) {
+	else if (
+		ts.isFunctionDeclaration(node) && node.name && pos >= node.name.getFullStart() && pos <= node.name.getEnd()
+	) {
 		return true;
 	}
 	else if (ts.isParameter(node) && pos >= node.name.getFullStart() && pos <= node.name.getEnd()) {
@@ -143,7 +113,10 @@ function isBlacklistNode(ts: typeof import('typescript'), node: ts.Node, pos: nu
 	else if (ts.isTypeReferenceNode(node)) {
 		return true;
 	}
-	else if (!allowAccessDotValue && ts.isPropertyAccessExpression(node) && node.expression.end === pos && node.name.text === 'value') {
+	else if (
+		!allowAccessDotValue && ts.isPropertyAccessExpression(node) && node.expression.end === pos
+		&& node.name.text === 'value'
+	) {
 		return true;
 	}
 	else if (

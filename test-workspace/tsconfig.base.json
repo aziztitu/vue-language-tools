@@ -13,7 +13,10 @@
 		"declaration": true,
 		"noEmit": true,
 		"jsx": "preserve",
-		"baseUrl": ".",
+		"baseUrl": "."
 	},
-	"include": [ ],
+	"vueCompilerOptions": {
+		"target": 99
+	},
+	"include": []
 }

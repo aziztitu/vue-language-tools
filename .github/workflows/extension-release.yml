@@ -1,4 +1,4 @@
-name: extension
+name: extension-release
 
 on:
   workflow_dispatch:
@@ -19,13 +19,34 @@ jobs:
           node-version: 20
           cache: pnpm
 
-      - run: pnpm install -g ovsx
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm run build:minify && pnpm ovsx publish
+      - name: Install global tools
+        run: pnpm install -g @vscode/vsce ovsx
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm run build && pnpm --filter volar run build:prod
+
+      - name: Publish to Open VSX
+        id: publish_ovsx
+        run: |
+          VERSION=$(jq -r .version package.json)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          if [[ "$VERSION" == *-* ]]; then
+            echo "Detected prerelease version: $VERSION"
+            pnpm ovsx publish --pre-release
+          else
+            echo "Detected stable release version: $VERSION"
+            pnpm ovsx publish
+          fi
         working-directory: extensions/vscode
         env:
           OVSX_PAT: ${{ secrets.OVSX_PAT }}
-    #   - run: pnpm ovsx publish
-    #     working-directory: extensions/vscode-typescript-plugin
-    #     env:
-    #       OVSX_PAT: ${{ secrets.OVSX_PAT }}
+
+      # - name: Publish to VSCode Marketplace
+      #   if: ${{ !contains(steps.publish_ovsx.outputs.version, '-') }}
+      #   working-directory: extensions/vscode
+      #   env:
+      #     VSCE_TOKEN: ${{ secrets.VSCE_TOKEN }}
+      #   run: vsce publish

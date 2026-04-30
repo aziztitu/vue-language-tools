@@ -1,24 +1,23 @@
 import type * as CompilerDOM from '@vue/compiler-dom';
 import type { SFCBlock, SFCParseResult } from '@vue/compiler-sfc';
-import { computed, pauseTracking, resumeTracking } from 'alien-signals';
+import { computed, setCurrentSub } from 'alien-signals';
 import type * as ts from 'typescript';
 import type { Sfc, SfcBlock, SfcBlockAttr, VueLanguagePluginReturn } from '../types';
-import { parseCssClassNames } from '../utils/parseCssClassNames';
-import { parseCssVars } from '../utils/parseCssVars';
-import { computedArray } from '../utils/signals';
+import { computedArray, computedItems } from '../utils/signals';
+
+export const templateInlineTsAsts = new WeakMap<CompilerDOM.RootNode, Map<string, ts.SourceFile>>();
 
 export function computedSfc(
 	ts: typeof import('typescript'),
 	plugins: VueLanguagePluginReturn[],
 	fileName: string,
 	getSnapshot: () => ts.IScriptSnapshot,
-	getParseResult: () => SFCParseResult | undefined
+	getParseResult: () => SFCParseResult | undefined,
 ): Sfc {
-
 	const getUntrackedSnapshot = () => {
-		pauseTracking();
+		const pausedSub = setCurrentSub(undefined);
 		const res = getSnapshot();
-		resumeTracking();
+		setCurrentSub(pausedSub);
 		return res;
 	};
 	const getContent = computed(() => {
@@ -28,7 +27,7 @@ export function computedSfc(
 		const newValue = getParseResult()?.descriptor.comments ?? [];
 		if (
 			oldValue?.length === newValue.length
-			&& oldValue?.every((v, i) => v === newValue[i])
+			&& oldValue.every((v, i) => v === newValue[i])
 		) {
 			return oldValue;
 		}
@@ -41,11 +40,17 @@ export function computedSfc(
 		(_block, base): NonNullable<Sfc['template']> => {
 			const compiledAst = computedTemplateAst(base);
 			return mergeObject(base, {
-				get ast() { return compiledAst()?.ast; },
-				get errors() { return compiledAst()?.errors; },
-				get warnings() { return compiledAst()?.warnings; },
+				get ast() {
+					return compiledAst().ast;
+				},
+				get errors() {
+					return compiledAst().errors;
+				},
+				get warnings() {
+					return compiledAst().warnings;
+				},
 			});
-		}
+		},
 	);
 	const getScript = computedNullableSfcBlock(
 		'script',
@@ -63,10 +68,14 @@ export function computedSfc(
 				return ts.createSourceFile(fileName + '.' + base.lang, '', 99 satisfies ts.ScriptTarget.Latest);
 			});
 			return mergeObject(base, {
-				get src() { return getSrc(); },
-				get ast() { return getAst(); },
+				get src() {
+					return getSrc();
+				},
+				get ast() {
+					return getAst();
+				},
 			});
-		}
+		},
 	);
 	const getOriginalScriptSetup = computedNullableSfcBlock(
 		'scriptSetup',
@@ -84,16 +93,20 @@ export function computedSfc(
 				return ts.createSourceFile(fileName + '.' + base.lang, '', 99 satisfies ts.ScriptTarget.Latest);
 			});
 			return mergeObject(base, {
-				get generic() { return getGeneric(); },
-				get ast() { return getAst(); },
+				get generic() {
+					return getGeneric();
+				},
+				get ast() {
+					return getAst();
+				},
 			});
-		}
+		},
 	);
 	const hasScript = computed(() => !!getParseResult()?.descriptor.script);
 	const hasScriptSetup = computed(() => !!getParseResult()?.descriptor.scriptSetup);
 	const getScriptSetup = computed(() => {
 		if (!hasScript() && !hasScriptSetup()) {
-			//#region monkey fix: https://github.com/vuejs/language-tools/pull/2113
+			// #region monkey fix: https://github.com/vuejs/language-tools/pull/2113
 			return {
 				content: '',
 				lang: 'ts',
@@ -114,67 +127,137 @@ export function computedSfc(
 		computed(() => getParseResult()?.descriptor.styles ?? []),
 		(getBlock, i) => {
 			const base = computedSfcBlock('style_' + i, 'css', getBlock);
+			const getSrc = computedAttrValue('__src', base, getBlock);
 			const getModule = computedAttrValue('__module', base, getBlock);
 			const getScoped = computed(() => !!getBlock().scoped);
-			const getCssVars = computed(() => [...parseCssVars(base.content)]);
-			const getClassNames = computed(() => [...parseCssClassNames(base.content)]);
-			return () => mergeObject(base, {
-				get module() { return getModule(); },
-				get scoped() { return getScoped(); },
-				get cssVars() { return getCssVars(); },
-				get classNames() { return getClassNames(); },
-			}) satisfies Sfc['styles'][number];
-		}
+			const getIr = computed(() => {
+				for (const plugin of plugins) {
+					const ast = plugin.compileSFCStyle?.(base.lang, base.content);
+					if (ast) {
+						return ast;
+					}
+				}
+			});
+			const getImports = computedItems(
+				() => getIr()?.imports ?? [],
+				(oldItem, newItem) => oldItem.text === newItem.text && oldItem.offset === newItem.offset,
+			);
+			const getBindings = computedItems(
+				() => getIr()?.bindings ?? [],
+				(oldItem, newItem) => oldItem.text === newItem.text && oldItem.offset === newItem.offset,
+			);
+			const getClassNames = computedItems(
+				() => getIr()?.classNames ?? [],
+				(oldItem, newItem) => oldItem.text === newItem.text && oldItem.offset === newItem.offset,
+			);
+			return () =>
+				mergeObject(base, {
+					get src() {
+						return getSrc();
+					},
+					get module() {
+						return getModule();
+					},
+					get scoped() {
+						return getScoped();
+					},
+					get imports() {
+						return getImports();
+					},
+					get bindings() {
+						return getBindings();
+					},
+					get classNames() {
+						return getClassNames();
+					},
+				}) satisfies Sfc['styles'][number];
+		},
 	);
 	const customBlocks = computedArray(
 		computed(() => getParseResult()?.descriptor.customBlocks ?? []),
 		(getBlock, i) => {
 			const base = computedSfcBlock('custom_block_' + i, 'txt', getBlock);
 			const getType = computed(() => getBlock().type);
-			return () => mergeObject(base, {
-				get type() { return getType(); },
-			}) satisfies Sfc['customBlocks'][number];
-		}
+			return () =>
+				mergeObject(base, {
+					get type() {
+						return getType();
+					},
+				}) satisfies Sfc['customBlocks'][number];
+		},
 	);
 
 	return {
-		get content() { return getContent(); },
-		get comments() { return getComments(); },
-		get template() { return getTemplate(); },
-		get script() { return getScript(); },
-		get scriptSetup() { return getScriptSetup(); },
-		get styles() { return styles; },
-		get customBlocks() { return customBlocks; },
+		get content() {
+			return getContent();
+		},
+		get comments() {
+			return getComments();
+		},
+		get template() {
+			return getTemplate();
+		},
+		get script() {
+			return getScript();
+		},
+		get scriptSetup() {
+			return getScriptSetup();
+		},
+		get styles() {
+			return styles;
+		},
+		get customBlocks() {
+			return customBlocks;
+		},
 	};
 
 	function computedTemplateAst(base: SfcBlock) {
-
 		let cache: {
-			template: string,
-			snapshot: ts.IScriptSnapshot,
-			result: CompilerDOM.CodegenResult,
-			plugin: VueLanguagePluginReturn,
+			template: string;
+			snapshot: ts.IScriptSnapshot;
+			result: CompilerDOM.CodegenResult;
+			plugin: VueLanguagePluginReturn;
 		} | undefined;
 
-		return computed(() => {
+		let inlineTsAsts: Map<string, any> | undefined;
 
+		function updateInlineTsAsts(newAst: CompilerDOM.RootNode, oldAst?: CompilerDOM.RootNode) {
+			let newTsAsts = templateInlineTsAsts.get(newAst);
+			if (!newTsAsts) {
+				templateInlineTsAsts.set(newAst, newTsAsts = new Map());
+			}
+			const oldTsAsts = oldAst && templateInlineTsAsts.get(oldAst) || inlineTsAsts;
+
+			if (oldTsAsts) {
+				for (const [text, ast] of oldTsAsts) {
+					if (!ast.__volar_used) {
+						oldTsAsts.delete(text);
+					}
+					else {
+						newTsAsts.set(text, ast);
+						ast.__volar_used = false;
+					}
+				}
+			}
+			inlineTsAsts = new Map(newTsAsts);
+		}
+
+		return computed(() => {
 			if (cache?.template === base.content) {
 				return {
 					errors: [],
 					warnings: [],
-					ast: cache?.result.ast,
+					ast: cache.result.ast,
 				};
 			}
 
 			// incremental update
 			if (cache?.plugin.updateSFCTemplate) {
-
 				const change = getUntrackedSnapshot().getChangeRange(cache.snapshot);
 				if (change) {
-
-					pauseTracking();
+					const pausedSub = setCurrentSub(undefined);
 					const templateOffset = base.startTagEnd;
-					resumeTracking();
+					setCurrentSub(pausedSub);
 
 					const newText = getUntrackedSnapshot().getText(change.span.start, change.span.start + change.newLength);
 					const newResult = cache.plugin.updateSFCTemplate(cache.result, {
@@ -183,6 +266,7 @@ export function computedSfc(
 						newText,
 					});
 					if (newResult) {
+						updateInlineTsAsts(newResult.ast, cache.result.ast);
 						cache.template = base.content;
 						cache.snapshot = getUntrackedSnapshot();
 						cache.result = newResult;
@@ -210,11 +294,13 @@ export function computedSfc(
 			}
 
 			for (const plugin of plugins) {
-
 				let result: CompilerDOM.CodegenResult | undefined;
 
 				try {
 					result = plugin.compileSFCTemplate?.(base.lang, base.content, options);
+					if (result) {
+						updateInlineTsAsts(result.ast, cache?.result.ast);
+					}
 				}
 				catch (e) {
 					const err = e as CompilerDOM.CompilerError;
@@ -222,7 +308,6 @@ export function computedSfc(
 				}
 
 				if (result || errors.length) {
-
 					if (result && !errors.length && !warnings.length) {
 						cache = {
 							template: base.content,
@@ -255,7 +340,7 @@ export function computedSfc(
 		name: string,
 		defaultLang: string,
 		getBlock: () => T | undefined,
-		resolve: (block: () => T, base: SfcBlock) => K
+		resolve: (block: () => T, base: SfcBlock) => K,
 	) {
 		const hasBlock = computed(() => !!getBlock());
 		return computed<K | undefined>(() => {
@@ -267,34 +352,53 @@ export function computedSfc(
 		});
 	}
 
-	function computedSfcBlock<T extends SFCBlock>(
+	function computedSfcBlock(
 		name: string,
 		defaultLang: string,
-		getBlock: () => T
+		getBlock: () => SFCBlock,
 	) {
 		const getLang = computed(() => getBlock().lang ?? defaultLang);
 		const getAttrs = computed(() => getBlock().attrs); // TODO: computed it
 		const getContent = computed(() => getBlock().content);
 		const getStartTagEnd = computed(() => getBlock().loc.start.offset);
 		const getEndTagStart = computed(() => getBlock().loc.end.offset);
-		const getStart = computed(() => getUntrackedSnapshot().getText(0, getStartTagEnd()).lastIndexOf('<' + getBlock().type));
-		const getEnd = computed(() => getEndTagStart() + getUntrackedSnapshot().getText(getEndTagStart(), getUntrackedSnapshot().getLength()).indexOf('>') + 1);
+		const getStart = computed(() =>
+			getUntrackedSnapshot().getText(0, getStartTagEnd()).lastIndexOf('<' + getBlock().type)
+		);
+		const getEnd = computed(() =>
+			getEndTagStart()
+			+ getUntrackedSnapshot().getText(getEndTagStart(), getUntrackedSnapshot().getLength()).indexOf('>') + 1
+		);
 		return {
 			name,
-			get lang() { return getLang(); },
-			get attrs() { return getAttrs(); },
-			get content() { return getContent(); },
-			get startTagEnd() { return getStartTagEnd(); },
-			get endTagStart() { return getEndTagStart(); },
-			get start() { return getStart(); },
-			get end() { return getEnd(); },
+			get lang() {
+				return getLang();
+			},
+			get attrs() {
+				return getAttrs();
+			},
+			get content() {
+				return getContent();
+			},
+			get startTagEnd() {
+				return getStartTagEnd();
+			},
+			get endTagStart() {
+				return getEndTagStart();
+			},
+			get start() {
+				return getStart();
+			},
+			get end() {
+				return getEnd();
+			},
 		};
 	}
 
 	function computedAttrValue<T extends SFCBlock>(
 		key: keyof T & string,
 		base: ReturnType<typeof computedSfcBlock>,
-		getBlock: () => T
+		getBlock: () => T,
 	) {
 		return computed(() => {
 			const val = getBlock()[key] as SfcBlockAttr | undefined;

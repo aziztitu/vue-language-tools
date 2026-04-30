@@ -3,7 +3,13 @@ name: auto-fix
 on:
   push:
     branches:
-      - 'master'
+      - master
+  pull_request:
+    branches:
+      - master
+
+permissions:
+  contents: write
 
 jobs:
   auto-fix:
@@ -22,7 +28,11 @@ jobs:
 
       # lint
       - name: Auto-fix
-        run: pnpm run lint:fix
+        run: npm run lint:fix
+
+      # format
+      - name: Format
+        run: npm run format
 
       # commit
       - name: Commit

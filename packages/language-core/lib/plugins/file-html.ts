@@ -1,14 +1,12 @@
 import type { SFCParseResult } from '@vue/compiler-sfc';
 import type { VueLanguagePlugin } from '../types';
 
-const sfcBlockReg = /\<(script|style)\b([\s\S]*?)\>([\s\S]*?)\<\/\1\>/g;
-const langReg = /\blang\s*=\s*(['\"]?)(\S*)\b\1/;
+const sfcBlockReg = /<(script|style)\b([\s\S]*?)>([\s\S]*?)<\/\1>/g;
+const langReg = /\blang\s*=\s*(['"]?)(\S*)\b\1/;
 
 const plugin: VueLanguagePlugin = ({ vueCompilerOptions }) => {
-
 	return {
-
-		version: 2.1,
+		version: 2.2,
 
 		getLanguageId(fileName) {
 			if (vueCompilerOptions.petiteVueExtensions.some(ext => fileName.endsWith(ext))) {
@@ -45,12 +43,11 @@ const plugin: VueLanguagePlugin = ({ vueCompilerOptions }) => {
 			let templateContent = content;
 
 			for (const match of content.matchAll(sfcBlockReg)) {
-
 				const matchText = match[0];
 				const tag = match[1];
-				const attrs = match[2];
+				const attrs = match[2]!;
 				const lang = attrs.match(langReg)?.[2];
-				const content = match[3];
+				const content = match[3]!;
 				const contentStart = match.index + matchText.indexOf(content);
 
 				if (tag === 'style') {
@@ -82,7 +79,8 @@ const plugin: VueLanguagePlugin = ({ vueCompilerOptions }) => {
 					};
 				}
 
-				templateContent = templateContent.slice(0, match.index) + ' '.repeat(matchText.length) + templateContent.slice(match.index + matchText.length);
+				templateContent = templateContent.slice(0, match.index) + ' '.repeat(matchText.length)
+					+ templateContent.slice(match.index + matchText.length);
 			}
 
 			sfc.descriptor.template = {
@@ -98,7 +96,7 @@ const plugin: VueLanguagePlugin = ({ vueCompilerOptions }) => {
 			};
 
 			return sfc;
-		}
+		},
 	};
 };
 

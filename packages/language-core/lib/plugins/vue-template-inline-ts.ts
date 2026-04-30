@@ -5,6 +5,7 @@ import { parseInterpolationNode } from '../codegen/template/templateChild';
 import { parseVForNode } from '../codegen/template/vFor';
 import { createTsAst } from '../codegen/utils';
 import type { Code, Sfc, VueLanguagePlugin } from '../types';
+import { templateInlineTsAsts } from '../virtualFile/computedSfc';
 
 const codeFeatures: CodeInformation = {
 	format: true,
@@ -23,12 +24,10 @@ const formatBrackets = {
 };
 
 const plugin: VueLanguagePlugin = ctx => {
-
 	const parseds = new WeakMap<Sfc, ReturnType<typeof parse>>();
 
 	return {
-
-		version: 2.1,
+		version: 2.2,
 
 		getEmbeddedCodes(_fileName, sfc) {
 			if (!sfc.template?.ast) {
@@ -47,15 +46,18 @@ const plugin: VueLanguagePlugin = ctx => {
 		},
 
 		resolveEmbeddedCode(_fileName, sfc, embeddedFile) {
+			if (!embeddedFile.id.startsWith('template_inline_ts_')) {
+				return;
+			}
 			// access template content to watch change
-			(() => sfc.template?.content)();
+			void sfc.template?.content;
 
 			const parsed = parseds.get(sfc);
 			if (parsed) {
 				const codes = parsed.get(embeddedFile.id);
 				if (codes) {
 					embeddedFile.content.push(...codes);
-					embeddedFile.parentCodeId = 'template';
+					embeddedFile.parentCodeId = sfc.template?.lang === 'md' ? 'root_tags' : 'template';
 				}
 			}
 		},
@@ -67,6 +69,7 @@ const plugin: VueLanguagePlugin = ctx => {
 			return data;
 		}
 		const templateContent = sfc.template.content;
+		const inlineTsAsts = templateInlineTsAsts.get(sfc.template.ast);
 		let i = 0;
 		sfc.template.ast.children.forEach(visit);
 		return data;
@@ -77,9 +80,9 @@ const plugin: VueLanguagePlugin = ctx => {
 				if (match) {
 					const { content } = match.groups!;
 					addFormatCodes(
-						content,
+						content!,
 						node.loc.start.offset + node.loc.source.indexOf('{') + 1,
-						formatBrackets.generic
+						formatBrackets.generic,
 					);
 				}
 			}
@@ -96,7 +99,7 @@ const plugin: VueLanguagePlugin = ctx => {
 						addFormatCodes(
 							prop.arg.loc.source,
 							prop.arg.loc.start.offset,
-							formatBrackets.normal
+							formatBrackets.normal,
 						);
 					}
 					if (
@@ -104,30 +107,30 @@ const plugin: VueLanguagePlugin = ctx => {
 						&& prop.exp.constType !== CompilerDOM.ConstantTypes.CAN_STRINGIFY // style='z-index: 2' will compile to {'z-index':'2'}
 					) {
 						if (prop.name === 'on' && prop.arg?.type === CompilerDOM.NodeTypes.SIMPLE_EXPRESSION) {
-							const ast = createTsAst(ctx.modules.typescript, prop.exp, prop.exp.content);
+							const ast = createTsAst(ctx.modules.typescript, inlineTsAsts, prop.exp.content);
 							if (isCompoundExpression(ctx.modules.typescript, ast)) {
 								addFormatCodes(
 									prop.exp.loc.source,
 									prop.exp.loc.start.offset,
-									formatBrackets.event
+									formatBrackets.event,
 								);
 							}
 							else {
 								const lines = prop.exp.content.split('\n');
-								const firstLineEmpty = lines[0].trim() === '';
-								const lastLineEmpty = lines[lines.length - 1].trim() === '';
+								const firstLineEmpty = lines[0]!.trim() === '';
+								const lastLineEmpty = lines[lines.length - 1]!.trim() === '';
 								if (lines.length <= 1 || (!firstLineEmpty && !lastLineEmpty)) {
 									addFormatCodes(
 										prop.exp.loc.source,
 										prop.exp.loc.start.offset,
-										formatBrackets.normal
+										formatBrackets.normal,
 									);
 								}
 								else {
 									addFormatCodes(
 										prop.exp.loc.source,
 										prop.exp.loc.start.offset,
-										['(', ');']
+										['(', ');'],
 									);
 								}
 							}
@@ -136,7 +139,7 @@ const plugin: VueLanguagePlugin = ctx => {
 							addFormatCodes(
 								prop.exp.loc.source,
 								prop.exp.loc.start.offset,
-								formatBrackets.params
+								formatBrackets.params,
 							);
 						}
 						else if (prop.rawName === 'v-for') {
@@ -144,14 +147,14 @@ const plugin: VueLanguagePlugin = ctx => {
 							addFormatCodes(
 								prop.exp.loc.source,
 								prop.exp.loc.start.offset,
-								formatBrackets.for
+								formatBrackets.for,
 							);
 						}
 						else {
 							addFormatCodes(
 								prop.exp.loc.source,
 								prop.exp.loc.start.offset,
-								formatBrackets.normal
+								formatBrackets.normal,
 							);
 						}
 					}
@@ -161,16 +164,14 @@ const plugin: VueLanguagePlugin = ctx => {
 				}
 			}
 			else if (node.type === CompilerDOM.NodeTypes.IF) {
-				for (let i = 0; i < node.branches.length; i++) {
-					const branch = node.branches[i];
+				for (const branch of node.branches) {
 					if (branch.condition?.type === CompilerDOM.NodeTypes.SIMPLE_EXPRESSION) {
 						addFormatCodes(
 							branch.condition.loc.source,
 							branch.condition.loc.start.offset,
-							formatBrackets.if
+							formatBrackets.if,
 						);
 					}
-
 					for (const childNode of branch.children) {
 						visit(childNode);
 					}
@@ -191,7 +192,7 @@ const plugin: VueLanguagePlugin = ctx => {
 					addFormatCodes(
 						templateContent.slice(start, end),
 						start,
-						formatBrackets.for
+						formatBrackets.for,
 					);
 				}
 				for (const child of node.children) {
@@ -214,22 +215,22 @@ const plugin: VueLanguagePlugin = ctx => {
 				// {{ ... }}
 				const [content, start] = parseInterpolationNode(node, templateContent);
 				const lines = content.split('\n');
-				const firstLineEmpty = lines[0].trim() === '';
-				const lastLineEmpty = lines[lines.length - 1].trim() === '';
+				const firstLineEmpty = lines[0]!.trim() === '';
+				const lastLineEmpty = lines[lines.length - 1]!.trim() === '';
 
 				if (content.includes('=>')) { // arrow function
 					if (lines.length <= 1 || (!firstLineEmpty && !lastLineEmpty)) {
 						addFormatCodes(
 							content,
 							start,
-							formatBrackets.normal
+							formatBrackets.normal,
 						);
 					}
 					else {
 						addFormatCodes(
 							content,
 							start,
-							['(', ');']
+							['(', ');'],
 						);
 					}
 				}
@@ -238,7 +239,7 @@ const plugin: VueLanguagePlugin = ctx => {
 						addFormatCodes(
 							content,
 							start,
-							formatBrackets.curly
+							formatBrackets.curly,
 						);
 					}
 					else {
@@ -247,8 +248,8 @@ const plugin: VueLanguagePlugin = ctx => {
 							start,
 							[
 								firstLineEmpty ? '(' : '(0 +',
-								lastLineEmpty ? ');' : '+ 0);'
-							]
+								lastLineEmpty ? ');' : '+ 0);',
+							],
 						);
 					}
 				}

@@ -7,7 +7,6 @@ const raw = {
 		semantic: true,
 		navigation: true,
 	},
-	none: {},
 	verification: {
 		verification: true,
 	},
@@ -28,10 +27,6 @@ const raw = {
 	navigationWithoutRename: {
 		navigation: { shouldRename: () => false },
 	},
-	navigationAndCompletion: {
-		navigation: true,
-		completion: true,
-	},
 	navigationAndAdditionalCompletion: {
 		navigation: true,
 		completion: { isAdditional: true },
@@ -45,15 +40,13 @@ const raw = {
 		completion: true,
 		semantic: true,
 	},
+	semanticWithoutHighlight: {
+		semantic: { shouldHighlight: () => false },
+	},
 	withoutHighlight: {
 		semantic: { shouldHighlight: () => false },
 		verification: true,
 		navigation: true,
-		completion: true,
-	},
-	withoutHighlightAndNavigation: {
-		semantic: { shouldHighlight: () => false },
-		verification: true,
 		completion: true,
 	},
 	withoutHighlightAndCompletion: {
@@ -61,9 +54,30 @@ const raw = {
 		verification: true,
 		navigation: true,
 	},
-	withoutHighlightAndCompletionAndNavigation: {
-		semantic: { shouldHighlight: () => false },
+	withoutSemantic: {
 		verification: true,
+		navigation: true,
+		completion: true,
+	},
+	doNotReportTs2339AndTs2551: {
+		verification: {
+			// https://typescript.tv/errors/#ts2339
+			// https://typescript.tv/errors/#ts2551
+			shouldReport: (_source, code) => String(code) !== '2339' && String(code) !== '2551',
+		},
+	},
+	doNotReportTs2353AndTs2561: {
+		verification: {
+			// https://typescript.tv/errors/#ts2353
+			// https://typescript.tv/errors/#ts2561
+			shouldReport: (_source, code) => String(code) !== '2353' && String(code) !== '2561',
+		},
+	},
+	doNotReportTs6133: {
+		verification: {
+			// https://typescript.tv/errors/#ts6133
+			shouldReport: (_source, code) => String(code) !== '6133',
+		},
 	},
 } satisfies Record<string, VueCodeInformation>;
 

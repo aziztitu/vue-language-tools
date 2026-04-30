@@ -1,7 +1,6 @@
-import type { CompletionItem, LanguageServicePlugin } from '@volar/language-service';
-import type * as vscode from 'vscode-languageserver-protocol';
+import type { CompletionItem, InsertTextFormat, LanguageServicePlugin } from '@volar/language-service';
 
-const cmds = [
+const cmds: [string, string?][] = [
 	['vue-ignore'],
 	['vue-skip'],
 	['vue-expect-error'],
@@ -25,7 +24,6 @@ export function create(): LanguageServicePlugin {
 		create() {
 			return {
 				provideCompletionItems(document, position) {
-
 					if (document.languageId !== 'html') {
 						return;
 					}
@@ -61,7 +59,7 @@ export function create(): LanguageServicePlugin {
 									},
 									newText: '@' + text,
 								},
-								insertTextFormat: 2 satisfies typeof vscode.InsertTextFormat.Snippet
+								insertTextFormat: 2 satisfies typeof InsertTextFormat.Snippet,
 							});
 						}
 					}

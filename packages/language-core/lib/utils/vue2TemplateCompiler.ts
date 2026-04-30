@@ -3,7 +3,6 @@ import * as CompilerDOM from '@vue/compiler-dom';
 const Vue2TemplateCompiler: typeof import('@vue/compiler-vue2') = require('@vue/compiler-vue2/build');
 
 export const compile: typeof CompilerDOM.compile = (template, options = {}) => {
-
 	if (typeof template !== 'string') {
 		throw new Error(`[@vue/language-core] compile() first argument must be string.`);
 	}
@@ -36,7 +35,7 @@ export const compile: typeof CompilerDOM.compile = (template, options = {}) => {
 			loc: {
 				source: '',
 				start: { column: -1, line: -1, offset: error.start },
-				end: { column: -1, line: -1, offset: error.end ?? error.start },
+				end: { column: -1, line: -1, offset: error.end },
 			},
 		});
 	}
@@ -48,7 +47,7 @@ export const compile: typeof CompilerDOM.compile = (template, options = {}) => {
 			loc: {
 				source: '',
 				start: { column: -1, line: -1, offset: error.start },
-				end: { column: -1, line: -1, offset: error.end ?? error.start },
+				end: { column: -1, line: -1, offset: error.end },
 			},
 		});
 	}
@@ -58,23 +57,24 @@ export const compile: typeof CompilerDOM.compile = (template, options = {}) => {
 		Object.assign({}, CompilerDOM.parserOptions, options, {
 			nodeTransforms: [
 				...CompilerDOM.DOMNodeTransforms,
-				...(options.nodeTransforms || [])
+				...(options.nodeTransforms || []),
 			],
 			directiveTransforms: Object.assign(
 				{},
 				CompilerDOM.DOMDirectiveTransforms,
-				options.directiveTransforms || {}
+				options.directiveTransforms || {},
 			),
-		})
+		}),
 	);
 };
 
 function baseCompile(
 	template: string,
-	options: CompilerDOM.CompilerOptions = {}
+	options: CompilerDOM.CompilerOptions = {},
 ) {
-
-	const onError = options.onError || (error => { throw error; });
+	const onError = options.onError || (error => {
+		throw error;
+	});
 	const isModuleMode = options.mode === 'module';
 
 	const prefixIdentifiers = options.prefixIdentifiers === true || isModuleMode;
@@ -89,8 +89,8 @@ function baseCompile(
 	const [nodeTransforms, directiveTransforms] = CompilerDOM.getBaseTransformPreset(prefixIdentifiers);
 
 	// v-for > v-if in vue 2
-	const transformIf = nodeTransforms[1];
-	const transformFor = nodeTransforms[3];
+	const transformIf = nodeTransforms[1]!;
+	const transformFor = nodeTransforms[3]!;
 	nodeTransforms[1] = transformFor;
 	nodeTransforms[3] = transformIf;
 
@@ -100,20 +100,20 @@ function baseCompile(
 			prefixIdentifiers,
 			nodeTransforms: [
 				...nodeTransforms,
-				...(options.nodeTransforms || []) // user transforms
+				...(options.nodeTransforms || []), // user transforms
 			],
 			directiveTransforms: Object.assign(
 				{},
 				directiveTransforms,
-				options.directiveTransforms || {} // user transforms
-			)
-		})
+				options.directiveTransforms || {}, // user transforms
+			),
+		}),
 	);
 
 	return CompilerDOM.generate(
 		ast,
 		Object.assign({}, options, {
-			prefixIdentifiers
-		})
+			prefixIdentifiers,
+		}),
 	);
 }

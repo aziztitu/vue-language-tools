@@ -1,9 +1,7 @@
-import { TypeScriptProjectHost, createLanguageServiceHost, resolveFileLanguageId } from '@volar/typescript';
+import { createLanguageServiceHost, resolveFileLanguageId, type TypeScriptProjectHost } from '@volar/typescript';
 import * as vue from '@vue/language-core';
 import { posix as path } from 'path-browserify';
 import type * as ts from 'typescript';
-import { code as typeHelpersCode } from 'vue-component-type-helpers';
-import { code as vue2TypeHelpersCode } from 'vue-component-type-helpers/vue2';
 
 import type {
 	ComponentMeta,
@@ -13,7 +11,7 @@ import type {
 	MetaCheckerOptions,
 	PropertyMeta,
 	PropertyMetaSchema,
-	SlotMeta
+	SlotMeta,
 } from './types';
 
 export * from './types';
@@ -24,49 +22,91 @@ export function createCheckerByJsonConfigBase(
 	ts: typeof import('typescript'),
 	rootDir: string,
 	json: any,
-	checkerOptions: MetaCheckerOptions = {}
+	checkerOptions: MetaCheckerOptions = {},
 ) {
 	rootDir = rootDir.replace(windowsPathReg, '/');
 	return baseCreate(
 		ts,
-		() => vue.createParsedCommandLineByJson(ts, ts.sys, rootDir, json, undefined, true),
+		() => {
+			const commandLine = vue.createParsedCommandLineByJson(ts, ts.sys, rootDir, json);
+			const { fileNames } = ts.parseJsonConfigFileContent(
+				json,
+				ts.sys,
+				rootDir,
+				{},
+				undefined,
+				undefined,
+				vue.getAllExtensions(commandLine.vueOptions)
+					.map(extension => ({
+						extension: extension.slice(1),
+						isMixedContent: true,
+						scriptKind: ts.ScriptKind.Deferred,
+					})),
+			);
+			return [commandLine, fileNames];
+		},
 		checkerOptions,
 		rootDir,
-		path.join(rootDir, 'jsconfig.json.global.vue')
+		path.join(rootDir, 'jsconfig.json.global.vue'),
 	);
 }
 
 export function createCheckerBase(
 	ts: typeof import('typescript'),
 	tsconfig: string,
-	checkerOptions: MetaCheckerOptions = {}
+	checkerOptions: MetaCheckerOptions = {},
 ) {
 	tsconfig = tsconfig.replace(windowsPathReg, '/');
 	return baseCreate(
 		ts,
-		() => vue.createParsedCommandLine(ts, ts.sys, tsconfig, true),
+		() => {
+			const commandLine = vue.createParsedCommandLine(ts, ts.sys, tsconfig);
+			const { fileNames } = ts.parseJsonSourceFileConfigFileContent(
+				ts.readJsonConfigFile(tsconfig, ts.sys.readFile),
+				ts.sys,
+				path.dirname(tsconfig),
+				{},
+				tsconfig,
+				undefined,
+				vue.getAllExtensions(commandLine.vueOptions)
+					.map(extension => ({
+						extension: extension.slice(1),
+						isMixedContent: true,
+						scriptKind: ts.ScriptKind.Deferred,
+					})),
+			);
+			return [commandLine, fileNames];
+		},
 		checkerOptions,
 		path.dirname(tsconfig),
-		tsconfig + '.global.vue'
+		tsconfig + '.global.vue',
 	);
 }
 
-export function baseCreate(
+function baseCreate(
 	ts: typeof import('typescript'),
-	getCommandLine: () => vue.ParsedCommandLine,
+	getConfigAndFiles: () => [
+		commandLine: vue.ParsedCommandLine,
+		fileNames: string[],
+	],
 	checkerOptions: MetaCheckerOptions,
 	rootPath: string,
-	globalComponentName: string
+	globalComponentName: string,
 ) {
-	let commandLine = getCommandLine();
-	let fileNames = commandLine.fileNames.map(path => path.replace(windowsPathReg, '/'));
+	let [commandLine, _fileNames] = getConfigAndFiles();
+	/**
+	 * Used to lookup if a file is referenced.
+	 */
+	let fileNames = new Set(_fileNames.map(path => path.replace(windowsPathReg, '/')));
 	let projectVersion = 0;
+
+	vue.writeGlobalTypes(commandLine.vueOptions, ts.sys.writeFile);
 
 	const projectHost: TypeScriptProjectHost = {
 		getCurrentDirectory: () => rootPath,
 		getProjectVersion: () => projectVersion.toString(),
 		getCompilationSettings: () => commandLine.options,
-		getScriptFileNames: () => fileNames,
+		getScriptFileNames: () => [...fileNames],
 		getProjectReferences: () => commandLine.projectReferences,
 	};
 	const globalComponentSnapshot = ts.ScriptSnapshot.fromString('<script setup lang="ts"></script>');
@@ -87,7 +127,7 @@ export function baseCreate(
 		ts,
 		projectHost.getCompilationSettings(),
 		commandLine.vueOptions,
-		id => id
+		id => id,
 	);
 	const language = vue.createLanguage(
 		[
@@ -130,41 +170,10 @@ export function baseCreate(
 			else {
 				language.scripts.delete(fileName);
 			}
-		}
+		},
 	);
 	const { languageServiceHost } = createLanguageServiceHost(ts, ts.sys, language, s => s, projectHost);
 	const tsLs = ts.createLanguageService(languageServiceHost);
-
-	const directoryExists = languageServiceHost.directoryExists?.bind(languageServiceHost);
-	const fileExists = languageServiceHost.fileExists.bind(languageServiceHost);
-	const getScriptSnapshot = languageServiceHost.getScriptSnapshot.bind(languageServiceHost);
-	const globalTypesName = vue.getGlobalTypesFileName(commandLine.vueOptions);
-	const globalTypesContents = `// @ts-nocheck\nexport {};\n` + vue.generateGlobalTypes(commandLine.vueOptions);
-	const globalTypesSnapshot: ts.IScriptSnapshot = {
-		getText: (start, end) => globalTypesContents.slice(start, end),
-		getLength: () => globalTypesContents.length,
-		getChangeRange: () => undefined,
-	};
-	if (directoryExists) {
-		languageServiceHost.directoryExists = path => {
-			if (path.endsWith('.vue-global-types')) {
-				return true;
-			}
-			return directoryExists(path);
-		};
-	}
-	languageServiceHost.fileExists = path => {
-		if (path.endsWith(`.vue-global-types/${globalTypesName}`) || path.endsWith(`.vue-global-types\\${globalTypesName}`)) {
-			return true;
-		}
-		return fileExists(path);
-	};
-	languageServiceHost.getScriptSnapshot = path => {
-		if (path.endsWith(`.vue-global-types/${globalTypesName}`) || path.endsWith(`.vue-global-types\\${globalTypesName}`)) {
-			return globalTypesSnapshot;
-		}
-		return getScriptSnapshot(path);
-	};
 
 	if (checkerOptions.forceUseTs) {
 		const getScriptKind = languageServiceHost.getScriptKind?.bind(languageServiceHost);
@@ -190,16 +199,18 @@ export function baseCreate(
 		updateFile(fileName: string, text: string) {
 			fileName = fileName.replace(windowsPathReg, '/');
 			scriptSnapshots.set(fileName, ts.ScriptSnapshot.fromString(text));
+			// Ensure the file is referenced
+			fileNames.add(fileName);
 			projectVersion++;
 		},
 		deleteFile(fileName: string) {
 			fileName = fileName.replace(windowsPathReg, '/');
-			fileNames = fileNames.filter(f => f !== fileName);
+			fileNames.delete(fileName);
 			projectVersion++;
 		},
 		reload() {
-			commandLine = getCommandLine();
-			fileNames = commandLine.fileNames.map(path => path.replace(windowsPathReg, '/'));
+			[commandLine, _fileNames] = getConfigAndFiles();
+			fileNames = new Set(_fileNames.map(path => path.replace(windowsPathReg, '/')));
 			this.clearCache();
 		},
 		clearCache() {
@@ -225,7 +236,9 @@ export function baseCreate(
 
 	function getMetaScriptContent(fileName: string) {
 		let code = `
-import * as Components from '${fileName.slice(0, -'.meta.ts'.length)}';
+import type { ComponentType, ComponentProps, ComponentEmit, ComponentSlots, ComponentExposed } from 'vue-component-meta/lib/helpers';
+import type * as Components from '${fileName.slice(0, -'.meta.ts'.length)}';
+
 export default {} as { [K in keyof typeof Components]: ComponentMeta<typeof Components[K]>; };
 
 interface ComponentMeta<T> {
@@ -234,9 +247,7 @@ interface ComponentMeta<T> {
 	emit: ComponentEmit<T>;
 	slots: ComponentSlots<T>;
 	exposed: ComponentExposed<T>;
-};
-
-${commandLine.vueOptions.target < 3 ? vue2TypeHelpersCode : typeHelpersCode}
+}
 `.trim();
 		return code;
 	}
@@ -248,7 +259,6 @@ ${commandLine.vueOptions.target < 3 ? vue2TypeHelpersCode : typeHelpersCode}
 	}
 
 	function getComponentMeta(componentPath: string, exportName = 'default'): ComponentMeta {
-
 		const program = tsLs.getProgram()!;
 		const typeChecker = program.getTypeChecker();
 		const { symbolNode, exports } = _getExports(program, typeChecker, componentPath);
@@ -259,7 +269,7 @@ ${commandLine.vueOptions.target < 3 ? vue2TypeHelpersCode : typeHelpersCode}
 		}
 
 		const componentType = typeChecker.getTypeOfSymbolAtLocation(_export, symbolNode);
-		const symbolProperties = componentType.getProperties() ?? [];
+		const symbolProperties = componentType.getProperties();
 
 		let _type: ReturnType<typeof getType> | undefined;
 		let _props: ReturnType<typeof getProps> | undefined;
@@ -267,7 +277,7 @@ ${commandLine.vueOptions.target < 3 ? vue2TypeHelpersCode : typeHelpersCode}
 		let _slots: ReturnType<typeof getSlots> | undefined;
 		let _exposed: ReturnType<typeof getExposed> | undefined;
 
-		return {
+		const meta = {
 			get type() {
 				return _type ?? (_type = getType());
 			},
@@ -285,8 +295,9 @@ ${commandLine.vueOptions.target < 3 ? vue2TypeHelpersCode : typeHelpersCode}
 			},
 		};
 
-		function getType() {
+		return meta;
 
+		function getType() {
 			const $type = symbolProperties.find(prop => prop.escapedName === 'type');
 
 			if ($type) {
@@ -298,14 +309,17 @@ ${commandLine.vueOptions.target < 3 ? vue2TypeHelpersCode : typeHelpersCode}
 		}
 
 		function getProps() {
-
 			const $props = symbolProperties.find(prop => prop.escapedName === 'props');
-			const propEventRegex = /^(on[A-Z])/;
+			const vnodeEventRegex = /^onVnode[A-Z]/;
 			let result: PropertyMeta[] = [];
 
 			if ($props) {
 				const type = typeChecker.getTypeOfSymbolAtLocation($props, symbolNode);
 				const properties = type.getProperties();
+
+				const eventProps = new Set(
+					meta.events.map(event => `on${event.name.charAt(0).toUpperCase()}${event.name.slice(1)}`),
+				);
 
 				result = properties
 					.map(prop => {
@@ -315,7 +329,7 @@ ${commandLine.vueOptions.target < 3 ? vue2TypeHelpersCode : typeHelpersCode}
 
 						return resolveNestedProperties(prop);
 					})
-					.filter(prop => !propEventRegex.test(prop.name));
+					.filter(prop => !vnodeEventRegex.test(prop.name) && !eventProps.has(prop.name));
 			}
 
 			// fill global
@@ -335,21 +349,25 @@ ${commandLine.vueOptions.target < 3 ? vue2TypeHelpersCode : typeHelpersCode}
 			const vueDefaults = vueFile && exportName === 'default'
 				? (vueFile instanceof vue.VueVirtualCode ? readVueComponentDefaultProps(vueFile, printer, ts) : {})
 				: {};
-			const tsDefaults = !vueFile ? readTsComponentDefaultProps(
-				ts.createSourceFile(
-					'/tmp.' + componentPath.slice(componentPath.lastIndexOf('.') + 1), // ts | js | tsx | jsx
-					snapshot.getText(0, snapshot.getLength()),
-					ts.ScriptTarget.Latest
-				),
-				exportName,
-				printer,
-				ts
-			) : {};
+			const tsDefaults = !vueFile
+				? readTsComponentDefaultProps(
+					ts.createSourceFile(
+						'/tmp.' + componentPath.slice(componentPath.lastIndexOf('.') + 1), // ts | js | tsx | jsx
+						snapshot.getText(0, snapshot.getLength()),
+						ts.ScriptTarget.Latest,
+					),
+					exportName,
+					printer,
+					ts,
+				)
+				: {};
 
-			for (const [propName, defaultExp] of Object.entries({
-				...vueDefaults,
-				...tsDefaults,
-			})) {
+			for (
+				const [propName, defaultExp] of Object.entries({
+					...vueDefaults,
+					...tsDefaults,
+				})
+			) {
 				const prop = result.find(p => p.name === propName);
 				if (prop) {
 					prop.default = defaultExp.default;
@@ -368,7 +386,6 @@ ${commandLine.vueOptions.target < 3 ? vue2TypeHelpersCode : typeHelpersCode}
 		}
 
 		function getEvents() {
-
 			const $emit = symbolProperties.find(prop => prop.escapedName === 'emit');
 
 			if ($emit) {
@@ -376,7 +393,6 @@ ${commandLine.vueOptions.target < 3 ? vue2TypeHelpersCode : typeHelpersCode}
 				const calls = type.getCallSignatures();
 
 				return calls.map(call => {
-
 					const {
 						resolveEventSignature,
 					} = createSchemaResolvers(typeChecker, symbolNode, checkerOptions, ts, language);
@@ -389,7 +405,6 @@ ${commandLine.vueOptions.target < 3 ? vue2TypeHelpersCode : typeHelpersCode}
 		}
 
 		function getSlots() {
-
 			const $slots = symbolProperties.find(prop => prop.escapedName === 'slots');
 
 			if ($slots) {
@@ -409,7 +424,6 @@ ${commandLine.vueOptions.target < 3 ? vue2TypeHelpersCode : typeHelpersCode}
 		}
 
 		function getExposed() {
-
 			const $exposed = symbolProperties.find(prop => prop.escapedName === 'exposed');
 
 			if ($exposed) {
@@ -435,10 +449,9 @@ ${commandLine.vueOptions.target < 3 ? vue2TypeHelpersCode : typeHelpersCode}
 	function _getExports(
 		program: ts.Program,
 		typeChecker: ts.TypeChecker,
-		componentPath: string
+		componentPath: string,
 	) {
-
-		const sourceFile = program?.getSourceFile(getMetaFileName(componentPath));
+		const sourceFile = program.getSourceFile(getMetaFileName(componentPath));
 		if (!sourceFile) {
 			throw 'Could not find main source file';
 		}
@@ -453,10 +466,9 @@ ${commandLine.vueOptions.target < 3 ? vue2TypeHelpersCode : typeHelpersCode}
 		let symbolNode: ts.Expression | undefined;
 
 		for (const symbol of exportedSymbols) {
-
 			const [declaration] = symbol.getDeclarations() ?? [];
 
-			if (ts.isExportAssignment(declaration)) {
+			if (declaration && ts.isExportAssignment(declaration)) {
 				symbolNode = declaration.expression;
 			}
 		}
@@ -475,18 +487,17 @@ ${commandLine.vueOptions.target < 3 ? vue2TypeHelpersCode : typeHelpersCode}
 	}
 }
 
-
 function createSchemaResolvers(
 	typeChecker: ts.TypeChecker,
 	symbolNode: ts.Expression,
 	{ rawType, schema: options, noDeclarations }: MetaCheckerOptions,
 	ts: typeof import('typescript'),
-	language: vue.Language<string>
+	language: vue.Language<string>,
 ) {
 	const visited = new Set<ts.Type>();
 
 	function shouldIgnore(subtype: ts.Type) {
-		const name = typeChecker.typeToString(subtype);
+		const name = getFullyQualifiedName(subtype);
 		if (name === 'any') {
 			return true;
 		}
@@ -519,8 +530,8 @@ function createSchemaResolvers(
 
 	function resolveNestedProperties(prop: ts.Symbol): PropertyMeta {
 		const subtype = typeChecker.getTypeOfSymbolAtLocation(prop, symbolNode);
-		let schema: PropertyMetaSchema;
-		let declarations: Declaration[];
+		let schema: PropertyMetaSchema | undefined;
+		let declarations: Declaration[] | undefined;
 
 		return {
 			name: prop.getEscapedName().toString(),
@@ -531,7 +542,7 @@ function createSchemaResolvers(
 				text: tag.text !== undefined ? ts.displayPartsToString(tag.text) : undefined,
 			})),
 			required: !(prop.flags & ts.SymbolFlags.Optional),
-			type: typeChecker.typeToString(subtype),
+			type: getFullyQualifiedName(subtype),
 			rawType: rawType ? subtype : undefined,
 			get declarations() {
 				return declarations ??= getDeclarations(prop.declarations ?? []);
@@ -546,12 +557,12 @@ function createSchemaResolvers(
 		const signatures = propType.getCallSignatures();
 		const paramType = signatures[0]?.parameters[0];
 		const subtype = paramType ? typeChecker.getTypeOfSymbolAtLocation(paramType, symbolNode) : typeChecker.getAnyType();
-		let schema: PropertyMetaSchema;
-		let declarations: Declaration[];
+		let schema: PropertyMetaSchema | undefined;
+		let declarations: Declaration[] | undefined;
 
 		return {
 			name: prop.getName(),
-			type: typeChecker.typeToString(subtype),
+			type: getFullyQualifiedName(subtype),
 			rawType: rawType ? subtype : undefined,
 			description: ts.displayPartsToString(prop.getDocumentationComment(typeChecker)),
 			get declarations() {
@@ -564,12 +575,12 @@ function createSchemaResolvers(
 	}
 	function resolveExposedProperties(expose: ts.Symbol): ExposeMeta {
 		const subtype = typeChecker.getTypeOfSymbolAtLocation(expose, symbolNode);
-		let schema: PropertyMetaSchema;
-		let declarations: Declaration[];
+		let schema: PropertyMetaSchema | undefined;
+		let declarations: Declaration[] | undefined;
 
 		return {
 			name: expose.getName(),
-			type: typeChecker.typeToString(subtype),
+			type: getFullyQualifiedName(subtype),
 			rawType: rawType ? subtype : undefined,
 			description: ts.displayPartsToString(expose.getDocumentationComment(typeChecker)),
 			get declarations() {
@@ -581,25 +592,50 @@ function createSchemaResolvers(
 		};
 	}
 	function resolveEventSignature(call: ts.Signature): EventMeta {
-		const subtype = typeChecker.getTypeOfSymbolAtLocation(call.parameters[1], symbolNode);
-		let schema: PropertyMetaSchema[];
-		let declarations: Declaration[];
+		let schema: PropertyMetaSchema[] | undefined;
+		let declarations: Declaration[] | undefined;
+		let subtype = undefined;
+		let subtypeStr = '[]';
+		let getSchema = () => [] as PropertyMetaSchema[];
+
+		if (call.parameters.length >= 2) {
+			subtype = typeChecker.getTypeOfSymbolAtLocation(call.parameters[1]!, symbolNode);
+			if ((call.parameters[1]!.valueDeclaration as any)?.dotDotDotToken) {
+				subtypeStr = getFullyQualifiedName(subtype);
+				getSchema = () => typeChecker.getTypeArguments(subtype! as ts.TypeReference).map(resolveSchema);
+			}
+			else {
+				subtypeStr = '[';
+				for (let i = 1; i < call.parameters.length; i++) {
+					subtypeStr += getFullyQualifiedName(typeChecker.getTypeOfSymbolAtLocation(call.parameters[i]!, symbolNode))
+						+ ', ';
+				}
+				subtypeStr = subtypeStr.slice(0, -2) + ']';
+				getSchema = () => {
+					const result: PropertyMetaSchema[] = [];
+					for (let i = 1; i < call.parameters.length; i++) {
+						result.push(resolveSchema(typeChecker.getTypeOfSymbolAtLocation(call.parameters[i]!, symbolNode)));
+					}
+					return result;
+				};
+			}
+		}
 
 		return {
-			name: (typeChecker.getTypeOfSymbolAtLocation(call.parameters[0], symbolNode) as ts.StringLiteralType).value,
+			name: (typeChecker.getTypeOfSymbolAtLocation(call.parameters[0]!, symbolNode) as ts.StringLiteralType).value,
 			description: ts.displayPartsToString(call.getDocumentationComment(typeChecker)),
 			tags: call.getJsDocTags().map(tag => ({
 				name: tag.name,
 				text: tag.text !== undefined ? ts.displayPartsToString(tag.text) : undefined,
 			})),
-			type: typeChecker.typeToString(subtype),
+			type: subtypeStr,
 			rawType: rawType ? subtype : undefined,
 			signature: typeChecker.signatureToString(call),
 			get declarations() {
 				return declarations ??= call.declaration ? getDeclarations([call.declaration]) : [];
 			},
 			get schema() {
-				return schema ??= typeChecker.getTypeArguments(subtype as ts.TypeReference).map(resolveSchema);
+				return schema ??= getSchema();
 			},
 		};
 	}
@@ -610,16 +646,18 @@ function createSchemaResolvers(
 			kind: 'event',
 			type: typeChecker.signatureToString(signature),
 			get schema() {
-				return schema ??= signature.parameters.length > 0
+				return schema ??= signature.parameters.length
 					? typeChecker
-						.getTypeArguments(typeChecker.getTypeOfSymbolAtLocation(signature.parameters[0], symbolNode) as ts.TypeReference)
+						.getTypeArguments(
+							typeChecker.getTypeOfSymbolAtLocation(signature.parameters[0]!, symbolNode) as ts.TypeReference,
+						)
 						.map(resolveSchema)
 					: undefined;
 			},
 		};
 	}
 	function resolveSchema(subtype: ts.Type): PropertyMetaSchema {
-		const type = typeChecker.typeToString(subtype);
+		const type = getFullyQualifiedName(subtype);
 
 		if (shouldIgnore(subtype)) {
 			return type;
@@ -628,7 +666,7 @@ function createSchemaResolvers(
 		visited.add(subtype);
 
 		if (subtype.isUnion()) {
-			let schema: PropertyMetaSchema[];
+			let schema: PropertyMetaSchema[] | undefined;
 			return {
 				kind: 'enum',
 				type,
@@ -637,10 +675,8 @@ function createSchemaResolvers(
 				},
 			};
 		}
-
-		// @ts-ignore - typescript internal, isArrayLikeType exists
 		else if (typeChecker.isArrayLikeType(subtype)) {
-			let schema: PropertyMetaSchema[];
+			let schema: PropertyMetaSchema[] | undefined;
 			return {
 				kind: 'array',
 				type,
@@ -649,12 +685,12 @@ function createSchemaResolvers(
 				},
 			};
 		}
-
 		else if (
-			subtype.getCallSignatures().length === 0 &&
-			(subtype.isClassOrInterface() || subtype.isIntersection() || (subtype as ts.ObjectType).objectFlags & ts.ObjectFlags.Anonymous)
+			subtype.getCallSignatures().length === 0
+			&& (subtype.isClassOrInterface() || subtype.isIntersection()
+				|| (subtype as ts.ObjectType).objectFlags & ts.ObjectFlags.Anonymous)
 		) {
-			let schema: Record<string, PropertyMeta>;
+			let schema: Record<string, PropertyMeta> | undefined;
 			return {
 				kind: 'object',
 				type,
@@ -663,12 +699,22 @@ function createSchemaResolvers(
 				},
 			};
 		}
-
 		else if (subtype.getCallSignatures().length === 1) {
-			return resolveCallbackSchema(subtype.getCallSignatures()[0]);
+			return resolveCallbackSchema(subtype.getCallSignatures()[0]!);
 		}
 
 		return type;
+	}
+	function getFullyQualifiedName(type: ts.Type) {
+		const str = typeChecker.typeToString(
+			type,
+			undefined,
+			ts.TypeFormatFlags.UseFullyQualifiedType | ts.TypeFormatFlags.NoTruncation,
+		);
+		if (str.includes('import(')) {
+			return str.replace(/import\(.*?\)\./g, '');
+		}
+		return str;
 	}
 	function getDeclarations(declaration: ts.Declaration[]) {
 		if (noDeclarations) {
@@ -713,7 +759,7 @@ function createSchemaResolvers(
 function readVueComponentDefaultProps(
 	root: vue.VueVirtualCode,
 	printer: ts.Printer | undefined,
-	ts: typeof import('typescript')
+	ts: typeof import('typescript'),
 ) {
 	let result: Record<string, {
 		default?: string;
@@ -727,7 +773,6 @@ function readVueComponentDefaultProps(
 	return result;
 
 	function scriptSetupWorker() {
-
 		if (!sfc.scriptSetup) {
 			return;
 		}
@@ -766,17 +811,19 @@ function readVueComponentDefaultProps(
 				if (initializer) {
 					const expText = printer?.printNode(ts.EmitHint.Expression, initializer, ast) ?? initializer.getText(ast);
 					result[name] = {
-						default: expText
+						default: expText,
 					};
 				}
 			}
 		}
 
-		if (scriptSetupRanges?.defineProp) {
-			for (const defineProp of scriptSetupRanges.defineProp) {
-				const obj = defineProp.argNode ? findObjectLiteralExpression(defineProp.argNode) : undefined;
+		if (scriptSetupRanges?.defineModel) {
+			for (const defineModel of scriptSetupRanges.defineModel) {
+				const obj = defineModel.argNode ? findObjectLiteralExpression(defineModel.argNode) : undefined;
 				if (obj) {
-					const name = defineProp.name ? sfc.scriptSetup.content.slice(defineProp.name.start, defineProp.name.end).slice(1, -1) : 'modelValue';
+					const name = defineModel.name
+						? sfc.scriptSetup.content.slice(defineModel.name.start, defineModel.name.end).slice(1, -1)
+						: 'modelValue';
 					result[name] = resolveModelOption(ast, obj, printer, ts);
 				}
 			}
@@ -797,7 +844,6 @@ function readVueComponentDefaultProps(
 	}
 
 	function scriptWorker() {
-
 		if (!sfc.script) {
 			return;
 		}
@@ -814,7 +860,7 @@ function readTsComponentDefaultProps(
 	ast: ts.SourceFile,
 	exportName: string,
 	printer: ts.Printer | undefined,
-	ts: typeof import('typescript')
+	ts: typeof import('typescript'),
 ) {
 	const props = getPropsNode();
 
@@ -825,7 +871,6 @@ function readTsComponentDefaultProps(
 	return {};
 
 	function getComponentNode() {
-
 		let result: ts.Node | undefined;
 
 		if (exportName === 'default') {
@@ -854,20 +899,17 @@ function readTsComponentDefaultProps(
 	}
 
 	function getComponentOptionsNode() {
-
 		const component = getComponentNode();
 
 		if (component) {
-
 			// export default { ... }
 			if (ts.isObjectLiteralExpression(component)) {
 				return component;
 			}
 			// export default defineComponent({ ... })
-			// export default Vue.extend({ ... })
 			else if (ts.isCallExpression(component)) {
 				if (component.arguments.length) {
-					const arg = component.arguments[0];
+					const arg = component.arguments[0]!;
 					if (ts.isObjectLiteralExpression(arg)) {
 						return arg;
 					}
@@ -891,18 +933,20 @@ function resolvePropsOption(
 	ast: ts.SourceFile,
 	props: ts.ObjectLiteralExpression,
 	printer: ts.Printer | undefined,
-	ts: typeof import('typescript')
+	ts: typeof import('typescript'),
 ) {
-
-	const result: Record<string, { default?: string, required?: boolean; }> = {};
+	const result: Record<string, { default?: string; required?: boolean }> = {};
 
 	for (const prop of props.properties) {
 		if (ts.isPropertyAssignment(prop)) {
-			const name = prop.name?.getText(ast);
+			const name = prop.name.getText(ast);
 			if (ts.isObjectLiteralExpression(prop.initializer)) {
-
-				const defaultProp = prop.initializer.properties.find(p => ts.isPropertyAssignment(p) && p.name.getText(ast) === 'default') as ts.PropertyAssignment | undefined;
-				const requiredProp = prop.initializer.properties.find(p => ts.isPropertyAssignment(p) && p.name.getText(ast) === 'required') as ts.PropertyAssignment | undefined;
+				const defaultProp = prop.initializer.properties.find(p =>
+					ts.isPropertyAssignment(p) && p.name.getText(ast) === 'default'
+				) as ts.PropertyAssignment | undefined;
+				const requiredProp = prop.initializer.properties.find(p =>
+					ts.isPropertyAssignment(p) && p.name.getText(ast) === 'required'
+				) as ts.PropertyAssignment | undefined;
 
 				result[name] = {};
 
@@ -926,9 +970,9 @@ function resolveModelOption(
 	ast: ts.SourceFile,
 	options: ts.ObjectLiteralExpression,
 	printer: ts.Printer | undefined,
-	ts: typeof import('typescript')
+	ts: typeof import('typescript'),
 ) {
-	const result: { default?: string; } = {};
+	const result: { default?: string } = {};
 
 	for (const prop of options.properties) {
 		if (ts.isPropertyAssignment(prop)) {
@@ -946,7 +990,7 @@ function resolveModelOption(
 
 function resolveDefaultOptionExpression(
 	_default: ts.Expression,
-	ts: typeof import('typescript')
+	ts: typeof import('typescript'),
 ) {
 	if (ts.isArrowFunction(_default)) {
 		if (ts.isBlock(_default.body)) {

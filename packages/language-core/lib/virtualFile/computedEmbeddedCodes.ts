@@ -9,7 +9,7 @@ import { VueEmbeddedCode } from './embeddedFile';
 export function computedEmbeddedCodes(
 	plugins: VueLanguagePluginReturn[],
 	fileName: string,
-	sfc: Sfc
+	sfc: Sfc,
 ) {
 	const getNameToBlockMap = computed(() => {
 		const blocks: Record<string, SfcBlock> = {};
@@ -36,12 +36,11 @@ export function computedEmbeddedCodes(
 			plugin,
 			fileName,
 			sfc,
-			name => getNameToBlockMap()[name]
+			name => getNameToBlockMap()[name],
 		)
 	);
 	const getFlatResult = computed(() => getPluginsResult.map(r => r()).flat());
 	const getStructuredResult = computed(() => {
-
 		const embeddedCodes: VirtualCode[] = [];
 
 		let remain = [...getFlatResult()];
@@ -62,7 +61,7 @@ export function computedEmbeddedCodes(
 
 		function consumeRemain() {
 			for (let i = remain.length - 1; i >= 0; i--) {
-				const { code, snapshot, mappings } = remain[i];
+				const { code, snapshot, mappings } = remain[i]!;
 				if (!code.parentCodeId) {
 					embeddedCodes.push({
 						id: code.id,
@@ -112,9 +111,9 @@ function computedPluginEmbeddedCodes(
 	plugin: VueLanguagePluginReturn,
 	fileName: string,
 	sfc: Sfc,
-	getBlockByName: (name: string) => SfcBlock | undefined
+	getBlockByName: (name: string) => SfcBlock | undefined,
 ) {
-	const computeds = new Map<string, () => { code: VueEmbeddedCode; snapshot: ts.IScriptSnapshot; }>();
+	const computeds = new Map<string, () => { code: VueEmbeddedCode; snapshot: ts.IScriptSnapshot }>();
 	const getComputedKey = (code: {
 		id: string;
 		lang: string;
@@ -132,42 +131,45 @@ function computedPluginEmbeddedCodes(
 			}
 			for (const codeInfo of embeddedCodeInfos) {
 				if (!computeds.has(getComputedKey(codeInfo))) {
-					computeds.set(getComputedKey(codeInfo), computed(() => {
-						const content: Code[] = [];
-						const code = new VueEmbeddedCode(codeInfo.id, codeInfo.lang, content);
-						for (const plugin of plugins) {
-							if (!plugin.resolveEmbeddedCode) {
-								continue;
-							}
-							try {
-								plugin.resolveEmbeddedCode(fileName, sfc, code);
-							}
-							catch (e) {
-								console.error(e);
-							}
-						}
-						const newText = toString(code.content);
-						const changeRanges = new Map<ts.IScriptSnapshot, ts.TextChangeRange | undefined>();
-						const snapshot: ts.IScriptSnapshot = {
-							getText: (start, end) => newText.slice(start, end),
-							getLength: () => newText.length,
-							getChangeRange(oldSnapshot) {
-								if (!changeRanges.has(oldSnapshot)) {
-									changeRanges.set(oldSnapshot, undefined);
-									const oldText = oldSnapshot.getText(0, oldSnapshot.getLength());
-									const changeRange = fullDiffTextChangeRange(oldText, newText);
-									if (changeRange) {
-										changeRanges.set(oldSnapshot, changeRange);
-									}
+					computeds.set(
+						getComputedKey(codeInfo),
+						computed(() => {
+							const content: Code[] = [];
+							const code = new VueEmbeddedCode(codeInfo.id, codeInfo.lang, content);
+							for (const plugin of plugins) {
+								if (!plugin.resolveEmbeddedCode) {
+									continue;
 								}
-								return changeRanges.get(oldSnapshot);
-							},
-						};
-						return {
-							code,
-							snapshot,
-						};
-					}));
+								try {
+									plugin.resolveEmbeddedCode(fileName, sfc, code);
+								}
+								catch (e) {
+									console.error(e);
+								}
+							}
+							const newText = toString(code.content);
+							const changeRanges = new Map<ts.IScriptSnapshot, ts.TextChangeRange | undefined>();
+							const snapshot: ts.IScriptSnapshot = {
+								getText: (start, end) => newText.slice(start, end),
+								getLength: () => newText.length,
+								getChangeRange(oldSnapshot) {
+									if (!changeRanges.has(oldSnapshot)) {
+										changeRanges.set(oldSnapshot, undefined);
+										const oldText = oldSnapshot.getText(0, oldSnapshot.getLength());
+										const changeRange = fullDiffTextChangeRange(oldText, newText);
+										if (changeRange) {
+											changeRanges.set(oldSnapshot, changeRange);
+										}
+									}
+									return changeRanges.get(oldSnapshot);
+								},
+							};
+							return {
+								code,
+								snapshot,
+							};
+						}),
+					);
 				}
 			}
 		}
@@ -204,11 +206,14 @@ function computedPluginEmbeddedCodes(
 			const tokenMappings = new Map<symbol, Mapping>();
 
 			for (let i = 0; i < mappings.length; i++) {
-				const mapping = mappings[i];
+				const mapping = mappings[i]!;
 				if (mapping.data.__combineOffset !== undefined) {
 					const offsetMapping = mappings[i - mapping.data.__combineOffset];
 					if (typeof offsetMapping === 'string' || !offsetMapping) {
-						throw new Error('Invalid offset mapping, mappings: ' + mappings.length + ', i: ' + i + ', offset: ' + mapping.data.__combineOffset);
+						throw new Error(
+							'Invalid offset mapping, mappings: ' + mappings.length + ', i: ' + i + ', offset: '
+								+ mapping.data.__combineOffset,
+						);
 					}
 					offsetMapping.sourceOffsets.push(...mapping.sourceOffsets);
 					offsetMapping.generatedOffsets.push(...mapping.generatedOffsets);
@@ -220,8 +225,8 @@ function computedPluginEmbeddedCodes(
 					if (tokenMappings.has(token)) {
 						const prevMapping = tokenMappings.get(token)!;
 						code.linkedCodeMappings.push({
-							sourceOffsets: [prevMapping.generatedOffsets[0]],
-							generatedOffsets: [mapping.generatedOffsets[0]],
+							sourceOffsets: [prevMapping.generatedOffsets[0]!],
+							generatedOffsets: [mapping.generatedOffsets[0]!],
 							lengths: [Number(token.description)],
 							data: undefined,
 						});
@@ -269,16 +274,26 @@ function fullDiffTextChangeRange(oldText: string, newText: string): ts.TextChang
 
 export function resolveCommonLanguageId(lang: string) {
 	switch (lang) {
-		case 'js': return 'javascript';
-		case 'cjs': return 'javascript';
-		case 'mjs': return 'javascript';
-		case 'ts': return 'typescript';
-		case 'cts': return 'typescript';
-		case 'mts': return 'typescript';
-		case 'jsx': return 'javascriptreact';
-		case 'tsx': return 'typescriptreact';
-		case 'pug': return 'jade';
-		case 'md': return 'markdown';
+		case 'js':
+			return 'javascript';
+		case 'cjs':
+			return 'javascript';
+		case 'mjs':
+			return 'javascript';
+		case 'ts':
+			return 'typescript';
+		case 'cts':
+			return 'typescript';
+		case 'mts':
+			return 'typescript';
+		case 'jsx':
+			return 'javascriptreact';
+		case 'tsx':
+			return 'typescriptreact';
+		case 'pug':
+			return 'jade';
+		case 'md':
+			return 'markdown';
 	}
 	return lang;
 }

@@ -1,6 +1,14 @@
 import type { ElementNode, SourceLocation } from '@vue/compiler-dom';
 import * as CompilerDOM from '@vue/compiler-dom';
-import type { CompilerError, SFCBlock, SFCDescriptor, SFCParseResult, SFCScriptBlock, SFCStyleBlock, SFCTemplateBlock } from '@vue/compiler-sfc';
+import type {
+	CompilerError,
+	SFCBlock,
+	SFCDescriptor,
+	SFCParseResult,
+	SFCScriptBlock,
+	SFCStyleBlock,
+	SFCTemplateBlock,
+} from '@vue/compiler-sfc';
 
 declare module '@vue/compiler-sfc' {
 	interface SFCDescriptor {
@@ -9,7 +17,6 @@ declare module '@vue/compiler-sfc' {
 }
 
 export function parse(source: string): SFCParseResult {
-
 	const errors: CompilerError[] = [];
 	const ast = CompilerDOM.parse(source, {
 		// there are no components at SFC parsing level
@@ -80,8 +87,8 @@ function createBlock(node: ElementNode, source: string) {
 	let { start, end } = node.loc;
 	let content = '';
 	if (node.children.length) {
-		start = node.children[0].loc.start;
-		end = node.children[node.children.length - 1].loc.end;
+		start = node.children[0]!.loc.start;
+		end = node.children[node.children.length - 1]!.loc.end;
 		content = source.slice(start.offset, end.offset);
 	}
 	else {
@@ -90,7 +97,7 @@ function createBlock(node: ElementNode, source: string) {
 			start = {
 				line: start.line,
 				column: start.column + offset,
-				offset: start.offset + offset
+				offset: start.offset + offset,
 			};
 		}
 		end = Object.assign({}, start);
@@ -98,14 +105,14 @@ function createBlock(node: ElementNode, source: string) {
 	const loc: SourceLocation = {
 		source: content,
 		start,
-		end
+		end,
 	};
 	const attrs: Record<string, any> = {};
 	const block: SFCBlock = {
 		type,
 		content,
 		loc,
-		attrs
+		attrs,
 	};
 	node.props.forEach(p => {
 		if (p.type === CompilerDOM.NodeTypes.ATTRIBUTE) {

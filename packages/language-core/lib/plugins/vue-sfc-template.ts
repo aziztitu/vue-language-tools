@@ -2,10 +2,8 @@ import type { VueLanguagePlugin } from '../types';
 import { allCodeFeatures } from './shared';
 
 const plugin: VueLanguagePlugin = () => {
-
 	return {
-
-		version: 2.1,
+		version: 2.2,
 
 		getEmbeddedCodes(_fileName, sfc) {
 			if (sfc.template?.lang === 'html') {

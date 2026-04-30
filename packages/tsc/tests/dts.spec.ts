@@ -21,7 +21,7 @@ describe('vue-tsc-dts', () => {
 	const options: ts.CreateProgramOptions = {
 		host,
 		rootNames: readFilesRecursive(workspace),
-		options: compilerOptions
+		options: compilerOptions,
 	};
 
 	let vueOptions: vue.VueCompilerOptions;
@@ -32,27 +32,27 @@ describe('vue-tsc-dts', () => {
 			vueOptions = vue.createParsedCommandLine(ts, ts.sys, configFilePath.replace(windowsPathReg, '/')).vueOptions;
 		}
 		else {
-			vueOptions = vue.getDefaultCompilerOptions();
-			vueOptions.extensions = ['.vue', '.cext'];
-			vueOptions.__setupedGlobalTypes = vue.setupGlobalTypes(workspace.replace(windowsPathReg, '/'), vueOptions, ts.sys);
+			vueOptions = vue.createParsedCommandLineByJson(ts, ts.sys, workspace.replace(windowsPathReg, '/'), {}).vueOptions;
+			vueOptions.target = 99;
+			vueOptions.extensions = ['vue', 'cext'];
 		}
+		vue.writeGlobalTypes(vueOptions, ts.sys.writeFile);
 		const vueLanguagePlugin = vue.createVueLanguagePlugin<string>(
 			ts,
 			options.options,
 			vueOptions,
-			id => id
+			id => id,
 		);
 		return [vueLanguagePlugin];
 	});
 	const program = createProgram(options);
 
 	for (const intputFile of options.rootNames) {
-
 		const expectedOutputFile = intputFile.endsWith('.ts')
 			? intputFile.slice(0, -'.ts'.length) + '.d.ts'
 			: intputFile.endsWith('.tsx')
-				? intputFile.slice(0, -'.tsx'.length) + '.d.ts'
-				: intputFile + '.d.ts';
+			? intputFile.slice(0, -'.tsx'.length) + '.d.ts'
+			: intputFile + '.d.ts';
 		it(`Input: ${shortenPath(intputFile)}, Output: ${shortenPath(expectedOutputFile)}`, () => {
 			let outputText: string | undefined;
 			const sourceFile = program.getSourceFile(intputFile);
@@ -63,7 +63,7 @@ describe('vue-tsc-dts', () => {
 					outputText = text;
 				},
 				undefined,
-				true
+				true,
 			);
 			expect(outputText ? normalizeNewline(outputText) : undefined).toMatchSnapshot();
 		});
@@ -71,6 +71,9 @@ describe('vue-tsc-dts', () => {
 });
 
 function readFilesRecursive(dir: string) {
+	if (path.relative(workspace, dir).startsWith('#')) {
+		return [];
+	}
 	const result: string[] = [];
 
 	for (const file of fs.readdirSync(dir)) {
@@ -81,11 +84,11 @@ function readFilesRecursive(dir: string) {
 		const stat = fs.statSync(filepath);
 		if (stat.isDirectory()) {
 			result.push(...readFilesRecursive(filepath));
-		} else {
+		}
+		else {
 			result.push(filepath);
 		}
 	}
-
 	return result;
 }
 

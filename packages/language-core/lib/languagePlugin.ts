@@ -1,6 +1,6 @@
 /// <reference types="@volar/typescript" />
 
-import { forEachEmbeddedCode, LanguagePlugin } from '@volar/language-core';
+import { forEachEmbeddedCode, type LanguagePlugin } from '@volar/language-core';
 import * as CompilerDOM from '@vue/compiler-dom';
 import type * as ts from 'typescript';
 import { createPlugins } from './plugins';
@@ -34,7 +34,7 @@ function getVueFileRegistry(key: string, plugins: VueLanguagePlugin[]) {
 function getFileRegistryKey(
 	compilerOptions: ts.CompilerOptions,
 	vueCompilerOptions: VueCompilerOptions,
-	plugins: VueLanguagePluginReturn[]
+	plugins: VueLanguagePluginReturn[],
 ) {
 	const values = [
 		...Object.keys(vueCompilerOptions)
@@ -52,7 +52,7 @@ export function createVueLanguagePlugin<T>(
 	ts: typeof import('typescript'),
 	compilerOptions: ts.CompilerOptions,
 	vueCompilerOptions: VueCompilerOptions,
-	asFileName: (scriptId: T) => string
+	asFileName: (scriptId: T) => string,
 ): LanguagePlugin<T, VueVirtualCode> {
 	const pluginContext: Parameters<VueLanguagePlugin>[0] = {
 		modules: {
@@ -70,7 +70,7 @@ export function createVueLanguagePlugin<T>(
 	const plugins = createPlugins(pluginContext);
 	const fileRegistry = getVueFileRegistry(
 		getFileRegistryKey(compilerOptions, vueCompilerOptions, plugins),
-		vueCompilerOptions.plugins
+		vueCompilerOptions.plugins,
 	);
 
 	return {
@@ -123,10 +123,13 @@ export function createVueLanguagePlugin<T>(
 						return {
 							code,
 							extension: '.' + lang,
-							scriptKind: lang === 'js' ? ts.ScriptKind.JS
-								: lang === 'jsx' ? ts.ScriptKind.JSX
-									: lang === 'tsx' ? ts.ScriptKind.TSX
-										: ts.ScriptKind.TS,
+							scriptKind: lang === 'js'
+								? ts.ScriptKind.JS
+								: lang === 'jsx'
+								? ts.ScriptKind.JSX
+								: lang === 'tsx'
+								? ts.ScriptKind.TSX
+								: ts.ScriptKind.TS,
 						};
 					}
 				}

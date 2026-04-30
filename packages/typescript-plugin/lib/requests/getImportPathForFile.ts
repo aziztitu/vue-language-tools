@@ -1,17 +1,16 @@
 import type * as ts from 'typescript';
-import type { RequestContext } from './types';
 
 export function getImportPathForFile(
-	this: RequestContext,
+	ts: typeof import('typescript'),
+	languageServiceHost: ts.LanguageServiceHost,
+	program: ts.Program,
 	fileName: string,
 	incomingFileName: string,
-	preferences: ts.UserPreferences
-) {
-	const { typescript: ts, languageService, languageServiceHost } = this;
-	const program = languageService.getProgram();
-	const incomingFile = program?.getSourceFile(incomingFileName);
-	const sourceFile = program?.getSourceFile(fileName);
-	if (!program || !sourceFile || !incomingFile) {
+	preferences: ts.UserPreferences,
+): string | undefined {
+	const incomingFile = program.getSourceFile(incomingFileName);
+	const sourceFile = program.getSourceFile(fileName);
+	if (!sourceFile || !incomingFile) {
 		return;
 	}
 
@@ -28,16 +27,14 @@ export function getImportPathForFile(
 		computedWithoutCache: boolean;
 	} = (ts as any).moduleSpecifiers.getModuleSpecifiersWithCacheInfo;
 	const resolutionHost = (ts as any).createModuleSpecifierResolutionHost(program, languageServiceHost);
-	const moduleSpecifiers = getModuleSpecifiersWithCacheInfo(
+	const { moduleSpecifiers } = getModuleSpecifiersWithCacheInfo(
 		(incomingFile as any).symbol,
 		program.getTypeChecker(),
 		languageServiceHost.getCompilationSettings(),
 		sourceFile,
 		resolutionHost,
-		preferences
+		preferences,
 	);
 
-	for (const moduleSpecifier of moduleSpecifiers.moduleSpecifiers) {
-		return moduleSpecifier;
-	}
+	return moduleSpecifiers[0];
 }

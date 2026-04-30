@@ -1,23 +1,22 @@
 import * as CompilerDOM from '@vue/compiler-dom';
 import { toString } from 'muggle-string';
 import type { Code } from '../../types';
+import { codeFeatures } from '../codeFeatures';
 import { newLine } from '../utils';
 import type { TemplateCodegenContext } from './context';
+import { generateElementChildren } from './elementChildren';
 import type { TemplateCodegenOptions } from './index';
 import { generateInterpolation } from './interpolation';
-import { generateTemplateChild } from './templateChild';
 
 export function* generateVIf(
 	options: TemplateCodegenOptions,
 	ctx: TemplateCodegenContext,
-	node: CompilerDOM.IfNode
+	node: CompilerDOM.IfNode,
 ): Generator<Code> {
-
 	const originalBlockConditionsLength = ctx.blockConditions.length;
 
 	for (let i = 0; i < node.branches.length; i++) {
-
-		const branch = node.branches[i];
+		const branch = node.branches[i]!;
 
 		if (i === 0) {
 			yield `if `;
@@ -36,12 +35,11 @@ export function* generateVIf(
 				options,
 				ctx,
 				'template',
-				ctx.codeFeatures.all,
+				codeFeatures.all,
 				branch.condition.content,
 				branch.condition.loc.start.offset,
-				branch.condition.loc,
 				`(`,
-				`)`
+				`)`,
 			)];
 			yield* codes;
 			ctx.blockConditions.push(toString(codes));
@@ -50,15 +48,7 @@ export function* generateVIf(
 		}
 
 		yield `{${newLine}`;
-		if (isFragment(node)) {
-			yield* ctx.resetDirectiveComments('end of v-if start');
-		}
-		let prev: CompilerDOM.TemplateChildNode | undefined;
-		for (const childNode of branch.children) {
-			yield* generateTemplateChild(options, ctx, childNode, prev);
-			prev = childNode;
-		}
-		yield* ctx.generateAutoImportCompletion();
+		yield* generateElementChildren(options, ctx, branch.children, isFragment(node));
 		yield `}${newLine}`;
 
 		if (addedBlockCondition) {

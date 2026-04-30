@@ -16,9 +16,6 @@ const ScriptSetupExact = defineComponent({
 		change(..._payload: any[]) { },
 		delete(..._payload: any[]) { },
 	},
-	setup() {
-		return {};
-	},
 });
 // https://vuejs.org/api/sfc-script-setup.html#defineexpose
 const ScriptSetupExposeExact = defineComponent({
@@ -41,9 +38,6 @@ const ScriptSetupTypeOnlyExact = defineComponent({
 		(e: 'change', id: number): void;
 		(e: 'update', value: string): void;
 	},
-	setup() {
-		return {};
-	},
 });
 // https://vuejs.org/api/sfc-script-setup.html#default-props-values-when-using-type-declaration
 const ScriptSetupDefaultPropsExact = defineComponent({
@@ -51,16 +45,9 @@ const ScriptSetupDefaultPropsExact = defineComponent({
 		msg?: string;
 		labels?: string[];
 	},
-	props: {
-		msg: {
-			default: 'hello'
-		},
-		labels: {
-			default: () => ['one', 'two']
-		}
-	},
-	setup() {
-		return {};
+	__defaults: {
+		msg: 'hello',
+		labels: () => ['one', 'two']
 	},
 });
 // vue 3.3 generic

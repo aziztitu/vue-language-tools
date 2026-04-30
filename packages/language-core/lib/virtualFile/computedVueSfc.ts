@@ -7,16 +7,15 @@ export function computedVueSfc(
 	plugins: VueLanguagePluginReturn[],
 	fileName: string,
 	languageId: string,
-	getSnapshot: () => ts.IScriptSnapshot
+	getSnapshot: () => ts.IScriptSnapshot,
 ) {
 	let cache: {
-		snapshot: ts.IScriptSnapshot,
-		sfc: SFCParseResult,
-		plugin: VueLanguagePluginReturn,
+		snapshot: ts.IScriptSnapshot;
+		sfc: SFCParseResult;
+		plugin: VueLanguagePluginReturn;
 	} | undefined;
 
 	return computed(() => {
-
 		// incremental update
 		if (cache?.plugin.updateSFC) {
 			const change = getSnapshot().getChangeRange(cache.snapshot);

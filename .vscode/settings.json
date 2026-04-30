@@ -1,24 +1,18 @@
 {
-	"typescript.format.semicolons": "insert",
-	"editor.insertSpaces": false,
-	"editor.detectIndentation": false,
-	"editor.codeActionsOnSave": {
-		"source.organizeImports": "always"
-	},
-	"json.format.keepLines": true,
-	"typescript.tsdk": "node_modules/typescript/lib",
-	"[typescript]": {
-		"editor.defaultFormatter": "vscode.typescript-language-features"
-	},
+	"dprint.path": "node_modules/dprint/dprint",
 	"[javascript]": {
-		"editor.defaultFormatter": "vscode.typescript-language-features"
+		"editor.defaultFormatter": "dprint.dprint"
+	},
+	"[typescript]": {
+		"editor.defaultFormatter": "dprint.dprint"
 	},
 	"[json]": {
-		"editor.defaultFormatter": "vscode.json-language-features"
+		"editor.defaultFormatter": "dprint.dprint"
 	},
 	"[jsonc]": {
-		"editor.defaultFormatter": "vscode.json-language-features"
+		"editor.defaultFormatter": "dprint.dprint"
 	},
+	"editor.formatOnSave": true,
 	"files.exclude": {
 		"packages/*/*.d.ts": true,
 		"packages/*/*.js": true,
@@ -26,5 +20,6 @@
 		"packages/*/lib/**/*.d.ts": true,
 		"packages/*/lib/**/*.js": true,
 		"packages/*/lib/**/*.map": true
-	}
+	},
+	"typescript.tsdk": "node_modules/typescript/lib"
 }

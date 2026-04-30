@@ -1,34 +1,27 @@
-import { VueVirtualCode, isSemanticTokensEnabled } from '@vue/language-core';
-import type { RequestContext } from './types';
+import { isSemanticTokensEnabled, type Language, type SourceScript, type VueVirtualCode } from '@vue/language-core';
+import type * as ts from 'typescript';
+
+interface ExtractPropsInfo {
+	name: string;
+	type: string;
+	model: boolean;
+}
 
 export function collectExtractProps(
-	this: RequestContext,
-	fileName: string,
-	templateCodeRange: [number, number]
-) {
-	const { typescript: ts, languageService, language, isTsPlugin, getFileId } = this;
-
-	const sourceScript = language.scripts.get(getFileId(fileName));
-	if (!sourceScript?.generated) {
-		return;
-	}
-
-	const root = sourceScript.generated.root;
-	if (!(root instanceof VueVirtualCode)) {
-		return;
-	}
-
-	const result = new Map<string, {
-		name: string;
-		type: string;
-		model: boolean;
-	}>();
-	const program = languageService.getProgram()!;
-	const sourceFile = program.getSourceFile(fileName)!;
+	ts: typeof import('typescript'),
+	language: Language,
+	program: ts.Program,
+	sourceScript: SourceScript,
+	virtualCode: VueVirtualCode,
+	templateCodeRange: [number, number],
+	leadingOffset: number = 0,
+): ExtractPropsInfo[] {
+	const result = new Map<string, ExtractPropsInfo>();
+	const sourceFile = program.getSourceFile(virtualCode.fileName)!;
 	const checker = program.getTypeChecker();
-	const script = sourceScript.generated?.languagePlugin.typescript?.getServiceScript(root);
-	const maps = script ? [...language.maps.forEach(script.code)].map(([_sourceScript, map]) => map) : [];
-	const { sfc } = root;
+	const serviceScript = sourceScript.generated!.languagePlugin.typescript?.getServiceScript(virtualCode);
+	const maps = serviceScript ? [...language.maps.forEach(serviceScript.code)].map(([, map]) => map) : [];
+	const { sfc } = virtualCode;
 
 	sourceFile.forEachChild(function visit(node) {
 		if (
@@ -40,7 +33,9 @@ export function collectExtractProps(
 			const { name } = node;
 			for (const map of maps) {
 				let mapped = false;
-				for (const source of map.toSourceLocation(name.getEnd() - (isTsPlugin ? sourceScript.snapshot.getLength() : 0))) {
+				for (
+					const source of map.toSourceLocation(name.getEnd() - leadingOffset)
+				) {
 					if (
 						source[0] >= sfc.template!.startTagEnd + templateCodeRange[0]
 						&& source[0] <= sfc.template!.startTagEnd + templateCodeRange[1]

@@ -1,26 +1,26 @@
 import type { Code } from '../../types';
-import { hyphenateTag } from '../../utils/shared';
 import { codeFeatures } from '../codeFeatures';
 import { generateStyleModules } from '../style/modules';
 import { generateStyleScopedClasses } from '../style/scopedClasses';
-import { type TemplateCodegenContext, createTemplateCodegenContext } from '../template/context';
+import { createTemplateCodegenContext, type TemplateCodegenContext } from '../template/context';
 import { generateInterpolation } from '../template/interpolation';
 import { generateStyleScopedClassReferences } from '../template/styleScopedClasses';
-import { endOfLine, newLine } from '../utils';
+import { endOfLine, generateSfcBlockSection, newLine } from '../utils';
+import { generateSpreadMerge } from '../utils/merge';
 import type { ScriptCodegenContext } from './context';
 import type { ScriptCodegenOptions } from './index';
 
 export function* generateTemplate(
 	options: ScriptCodegenOptions,
-	ctx: ScriptCodegenContext
+	ctx: ScriptCodegenContext,
 ): Generator<Code, TemplateCodegenContext> {
 	ctx.generatedTemplate = true;
 
 	const templateCodegenCtx = createTemplateCodegenContext({
 		scriptSetupBindingNames: new Set(),
-		edited: options.edited,
 	});
 	yield* generateTemplateCtx(options);
+	yield* generateTemplateElements();
 	yield* generateTemplateComponents(options);
 	yield* generateTemplateDirectives(options);
 	yield* generateTemplateBody(options, templateCodegenCtx);
@@ -40,33 +40,26 @@ function* generateTemplateCtx(options: ScriptCodegenOptions): Generator<Code> {
 	}
 
 	yield `const __VLS_ctx = `;
-	if (exps.length === 1) {
-		yield exps[0];
-		yield `${endOfLine}`;
-	}
-	else {
-		yield `{${newLine}`;
-		for (const exp of exps) {
-			yield `...`;
-			yield exp;
-			yield `,${newLine}`;
-		}
-		yield `}${endOfLine}`;
-	}
+	yield* generateSpreadMerge(exps);
+	yield endOfLine;
+}
+
+function* generateTemplateElements(): Generator<Code> {
+	yield `let __VLS_elements!: __VLS_IntrinsicElements${endOfLine}`;
 }
 
 function* generateTemplateComponents(options: ScriptCodegenOptions): Generator<Code> {
-	const types: Code[] = [];
+	const types: string[] = [`typeof __VLS_ctx`];
 
 	if (options.sfc.script && options.scriptRanges?.exportDefault?.componentsOption) {
 		const { componentsOption } = options.scriptRanges.exportDefault;
 		yield `const __VLS_componentsOption = `;
-		yield [
-			options.sfc.script.content.slice(componentsOption.start, componentsOption.end),
-			'script',
+		yield generateSfcBlockSection(
+			options.sfc.script,
 			componentsOption.start,
+			componentsOption.end,
 			codeFeatures.navigation,
-		];
+		);
 		yield endOfLine;
 		types.push(`typeof __VLS_componentsOption`);
 	}
@@ -87,52 +80,40 @@ function* generateTemplateComponents(options: ScriptCodegenOptions): Generator<C
 		}
 	}
 
+	// TODO: Maybe consider removing this (it was removed from original repo)
 	types.push(`typeof __VLS_ctx`);
 	for (const localImportedComponent of localImportedComponentNames) {
 		types.push(`{${localImportedComponent}: typeof ${localImportedComponent}}`);
 	}
 
-	yield `type __VLS_LocalComponents =`;
-	for (const type of types) {
-		yield ` & `;
-		yield type;
-	}
-	yield endOfLine;
+	yield `type __VLS_LocalComponents = ${types.join(` & `)}${endOfLine}`;
 
 	yield `let __VLS_components!: __VLS_LocalComponents & __VLS_GlobalComponents${endOfLine}`;
 }
 
 export function* generateTemplateDirectives(options: ScriptCodegenOptions): Generator<Code> {
-	const types: Code[] = [];
+	const types: string[] = [`typeof __VLS_ctx`];
 
 	if (options.sfc.script && options.scriptRanges?.exportDefault?.directivesOption) {
 		const { directivesOption } = options.scriptRanges.exportDefault;
 		yield `const __VLS_directivesOption = `;
-		yield [
-			options.sfc.script.content.slice(directivesOption.start, directivesOption.end),
-			'script',
+		yield generateSfcBlockSection(
+			options.sfc.script,
 			directivesOption.start,
+			directivesOption.end,
 			codeFeatures.navigation,
-		];
+		);
 		yield endOfLine;
-		types.push(`typeof __VLS_directivesOption`);
+		types.push(`__VLS_ResolveDirectives<typeof __VLS_directivesOption>`);
 	}
 
-	types.push(`typeof __VLS_ctx`);
-
-	yield `type __VLS_LocalDirectives =`;
-	for (const type of types) {
-		yield ` & `;
-		yield type;
-	}
-	yield endOfLine;
-
+	yield `type __VLS_LocalDirectives = ${types.join(` & `)}${endOfLine}`;
 	yield `let __VLS_directives!: __VLS_LocalDirectives & __VLS_GlobalDirectives${endOfLine}`;
 }
 
 function* generateTemplateBody(
 	options: ScriptCodegenOptions,
-	templateCodegenCtx: TemplateCodegenContext
+	templateCodegenCtx: TemplateCodegenContext,
 ): Generator<Code> {
 	yield* generateStyleScopedClasses(options, templateCodegenCtx);
 	yield* generateStyleScopedClassReferences(templateCodegenCtx, true);
@@ -143,7 +124,6 @@ function* generateTemplateBody(
 		yield* options.templateCodegen.codes;
 	}
 	else {
-		yield `// no template${newLine}`;
 		if (!options.scriptSetupRanges?.defineSlots) {
 			yield `type __VLS_Slots = {}${endOfLine}`;
 		}
@@ -159,42 +139,17 @@ function* generateCssVars(options: ScriptCodegenOptions, ctx: TemplateCodegenCon
 	}
 	yield `// CSS variable injection ${newLine}`;
 	for (const style of options.sfc.styles) {
-		for (const cssBind of style.cssVars) {
+		for (const binding of style.bindings) {
 			yield* generateInterpolation(
 				options,
 				ctx,
 				style.name,
 				codeFeatures.all,
-				cssBind.text,
-				cssBind.offset
+				binding.text,
+				binding.offset,
 			);
 			yield endOfLine;
 		}
 	}
 	yield `// CSS variable injection end ${newLine}`;
-}
-
-export function getTemplateUsageVars(options: ScriptCodegenOptions, ctx: ScriptCodegenContext) {
-
-	const usageVars = new Set<string>();
-	const components = new Set(options.sfc.template?.ast?.components);
-
-	if (options.templateCodegen) {
-		// fix import components unused report
-		for (const varName of ctx.bindingNames) {
-			if (components.has(varName) || components.has(hyphenateTag(varName))) {
-				usageVars.add(varName);
-			}
-		}
-		for (const component of components) {
-			if (component.includes('.')) {
-				usageVars.add(component.split('.')[0]);
-			}
-		}
-		for (const [varName] of options.templateCodegen.accessExternalVariables) {
-			usageVars.add(varName);
-		}
-	}
-
-	return usageVars;
 }

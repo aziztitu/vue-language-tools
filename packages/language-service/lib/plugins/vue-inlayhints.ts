@@ -1,52 +1,49 @@
-import { tsCodegen, VueVirtualCode } from '@vue/language-core';
-import { collectIdentifiers } from '@vue/language-core/lib/codegen/utils/index';
+import type { InlayHint, InlayHintKind, LanguageServicePlugin } from '@volar/language-service';
+import { collectBindingIdentifiers, tsCodegen } from '@vue/language-core';
 import type * as ts from 'typescript';
-import type * as vscode from 'vscode-languageserver-protocol';
-import { URI } from 'vscode-uri';
-import type { LanguageServicePlugin } from '../types';
+import { resolveEmbeddedCode } from '../utils';
 
 export function create(ts: typeof import('typescript')): LanguageServicePlugin {
 	return {
-		name: 'vue-inlay-hints',
+		name: 'vue-inlayhints',
 		capabilities: {
 			inlayHintProvider: {},
 		},
 		create(context) {
 			return {
 				async provideInlayHints(document, range) {
-
-					const uri = URI.parse(document.uri);
-					const decoded = context.decodeEmbeddedDocumentUri(uri);
-					const sourceScript = decoded && context.language.scripts.get(decoded[0]);
-					const virtualCode = decoded && sourceScript?.generated?.embeddedCodes.get(decoded[1]);
-					if (!(virtualCode instanceof VueVirtualCode)) {
+					const info = resolveEmbeddedCode(context, document.uri);
+					if (info?.code.id !== 'main') {
 						return;
 					}
 
 					const settings: Record<string, boolean> = {};
 					async function getSettingEnabled(key: string) {
-						return settings[key] ??= await context.env.getConfiguration?.<boolean>(key) ?? false;
+						return settings[key] ??= await context.env.getConfiguration<boolean>?.(key) ?? false;
 					}
 
-					const result: vscode.InlayHint[] = [];
+					const result: InlayHint[] = [];
+					const { sfc } = info.root;
 
-					const codegen = tsCodegen.get(virtualCode.sfc);
+					const codegen = tsCodegen.get(sfc);
 					const inlayHints = [
 						...codegen?.getGeneratedTemplate()?.inlayHints ?? [],
-						...codegen?.getGeneratedScript()?.inlayHints ?? [],
+						...codegen?.getGeneratedScript().inlayHints ?? [],
 					];
 					const scriptSetupRanges = codegen?.getScriptSetupRanges();
 
-					if (scriptSetupRanges?.defineProps?.destructured && virtualCode.sfc.scriptSetup?.ast) {
+					if (scriptSetupRanges?.defineProps?.destructured && sfc.scriptSetup?.ast) {
 						const setting = 'vue.inlayHints.destructuredProps';
 						const enabled = await getSettingEnabled(setting);
 
 						if (enabled) {
-							for (const [prop, isShorthand] of findDestructuredProps(
-								ts,
-								virtualCode.sfc.scriptSetup.ast,
-								scriptSetupRanges.defineProps.destructured.keys()
-							)) {
+							for (
+								const [prop, isShorthand] of findDestructuredProps(
+									ts,
+									sfc.scriptSetup.ast,
+									scriptSetupRanges.defineProps.destructured.keys(),
+								)
+							) {
 								const name = prop.text;
 								const end = prop.getEnd();
 								const pos = isShorthand ? end : end - name.length;
@@ -62,9 +59,9 @@ export function create(ts: typeof import('typescript')): LanguageServicePlugin {
 					}
 
 					const blocks = [
-						virtualCode.sfc.template,
-						virtualCode.sfc.script,
-						virtualCode.sfc.scriptSetup,
+						sfc.template,
+						sfc.script,
+						sfc.scriptSetup,
 					];
 					const start = document.offsetAt(range.start);
 					const end = document.offsetAt(range.end);
@@ -90,11 +87,13 @@ export function create(ts: typeof import('typescript')): LanguageServicePlugin {
 							paddingRight: hint.paddingRight,
 							paddingLeft: hint.paddingLeft,
 							position: document.positionAt(hintOffset),
-							kind: 2 satisfies typeof vscode.InlayHintKind.Parameter,
-							tooltip: hint.tooltip ? {
-								kind: 'markdown',
-								value: hint.tooltip,
-							} : undefined,
+							kind: 2 satisfies typeof InlayHintKind.Parameter,
+							tooltip: hint.tooltip
+								? {
+									kind: 'markdown',
+									value: hint.tooltip,
+								}
+								: undefined,
 						});
 					}
 
@@ -117,20 +116,19 @@ type Scope = Record<string, boolean>;
 export function findDestructuredProps(
 	ts: typeof import('typescript'),
 	ast: ts.SourceFile,
-	props: MapIterator<string>
+	props: MapIterator<string>,
 ) {
 	const rootScope: Scope = Object.create(null);
 	const scopeStack: Scope[] = [rootScope];
-	let currentScope: Scope = rootScope;
+	let currentScope: Scope | null = rootScope;
 	const excludedIds = new WeakSet<ts.Identifier>();
-	const parentStack: ts.Node[] = [];
 
 	for (const prop of props) {
 		rootScope[prop] = true;
 	}
 
 	function pushScope() {
-		scopeStack.push((currentScope = Object.create(currentScope)));
+		scopeStack.push(currentScope = Object.create(currentScope));
 	}
 
 	function popScope() {
@@ -160,8 +158,8 @@ export function findDestructuredProps(
 				}
 			}
 			else if (
-				ts.isFunctionDeclaration(stmt) ||
-				ts.isClassDeclaration(stmt)
+				ts.isFunctionDeclaration(stmt)
+				|| ts.isClassDeclaration(stmt)
 			) {
 				const declare = ts.getModifiers(stmt)?.find(modifier => modifier.kind === ts.SyntaxKind.DeclareKeyword);
 				if (!stmt.name || declare) {
@@ -170,14 +168,14 @@ export function findDestructuredProps(
 				registerLocalBinding(stmt.name);
 			}
 			else if (
-				(ts.isForOfStatement(stmt) || ts.isForInStatement(stmt)) &&
-				ts.isVariableDeclarationList(stmt.initializer)
+				(ts.isForOfStatement(stmt) || ts.isForInStatement(stmt))
+				&& ts.isVariableDeclarationList(stmt.initializer)
 			) {
-				walkVariableDeclaration(stmt.initializer.declarations[0], isRoot);
+				walkVariableDeclaration(stmt.initializer.declarations[0]!, isRoot);
 			}
 			else if (
-				ts.isLabeledStatement(stmt) &&
-				ts.isVariableDeclaration(stmt.statement)
+				ts.isLabeledStatement(stmt)
+				&& ts.isVariableDeclaration(stmt.statement)
 			) {
 				walkVariableDeclaration(stmt.statement, isRoot);
 			}
@@ -186,16 +184,16 @@ export function findDestructuredProps(
 
 	function walkVariableDeclaration(decl: ts.VariableDeclaration, isRoot = false) {
 		const { initializer, name } = decl;
-		const isDefineProps =
-			isRoot
+		const isDefineProps = isRoot
 			&& initializer
 			&& ts.isCallExpression(initializer)
 			&& initializer.expression.getText(ast) === 'defineProps';
 
-		for (const { id } of collectIdentifiers(ts, name)) {
+		for (const { id } of collectBindingIdentifiers(ts, name)) {
 			if (isDefineProps) {
 				excludedIds.add(id);
-			} else {
+			}
+			else {
 				registerLocalBinding(id);
 			}
 		}
@@ -208,7 +206,7 @@ export function findDestructuredProps(
 		}
 
 		for (const p of parameters) {
-			for (const { id } of collectIdentifiers(ts, p)) {
+			for (const { id } of collectBindingIdentifiers(ts, p)) {
 				registerLocalBinding(id);
 			}
 		}
@@ -223,11 +221,9 @@ export function findDestructuredProps(
 		});
 
 		function enter(node: ts.Node) {
-			parent && parentStack.push(parent);
-
 			if (
-				ts.isTypeLiteralNode(node) ||
-				ts.isTypeReferenceNode(node)
+				ts.isTypeLiteralNode(node)
+				|| ts.isTypeReferenceNode(node)
 			) {
 				return false;
 			}
@@ -267,7 +263,7 @@ export function findDestructuredProps(
 				&& !excludedIds.has(node)
 			) {
 				const name = node.text;
-				if (currentScope[name]) {
+				if (currentScope![name]) {
 					const isShorthand = ts.isShorthandPropertyAssignment(parent);
 					references.push([node, isShorthand]);
 				}
@@ -275,7 +271,6 @@ export function findDestructuredProps(
 		}
 
 		function leave(node: ts.Node) {
-			parent && parentStack.pop();
 			if (
 				ts.isFunctionLike(node)
 				|| ts.isCatchClause(node)
@@ -293,7 +288,7 @@ export function findDestructuredProps(
 	// TODO: more conditions
 	function isReferencedIdentifier(
 		id: ts.Identifier,
-		parent: ts.Node | null
+		parent: ts.Node | null,
 	) {
 		if (!parent) {
 			return false;
@@ -304,18 +299,18 @@ export function findDestructuredProps(
 		}
 
 		if (
-			ts.isExpressionWithTypeArguments(parent) ||
-			ts.isInterfaceDeclaration(parent) ||
-			ts.isTypeAliasDeclaration(parent) ||
-			ts.isPropertySignature(parent)
+			ts.isExpressionWithTypeArguments(parent)
+			|| ts.isInterfaceDeclaration(parent)
+			|| ts.isTypeAliasDeclaration(parent)
+			|| ts.isPropertySignature(parent)
 		) {
 			return false;
 		}
 
 		if (
-			ts.isPropertyAccessExpression(parent) ||
-			ts.isPropertyAssignment(parent) ||
-			ts.isPropertyDeclaration(parent)
+			ts.isPropertyAccessExpression(parent)
+			|| ts.isPropertyAssignment(parent)
+			|| ts.isPropertyDeclaration(parent)
 		) {
 			if (parent.name === id) {
 				return false;

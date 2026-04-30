@@ -16,9 +16,6 @@ const ScriptSetupExact = defineComponent({
 		change(..._payload: any[]) { },
 		delete(..._payload: any[]) { },
 	},
-	setup() {
-		return {};
-	},
 });
 // https://vuejs.org/api/sfc-script-setup.html#defineexpose
 const ScriptSetupExposeExact = defineComponent({
@@ -44,9 +41,6 @@ const ScriptSetupTypeOnlyExact = defineComponent({
 		change(_id: number) { },
 		update(_value: string) { },
 	},
-	setup() {
-		return {};
-	},
 });
 // https://vuejs.org/api/sfc-script-setup.html#default-props-values-when-using-type-declaration
 const ScriptSetupDefaultPropsExact = defineComponent({
@@ -59,9 +53,6 @@ const ScriptSetupDefaultPropsExact = defineComponent({
 			type: Array as PropType<string[]>,
 			default: () => ['one', 'two']
 		},
-	},
-	setup() {
-		return {};
 	},
 });
 // vue 3.3 generic

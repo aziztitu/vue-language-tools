@@ -1,8 +1,10 @@
 import { defineComponent } from 'vue';
-import { MyProps } from './PropDefinitions';
+import type { MyProps } from './PropDefinitions';
 
 export default defineComponent((props: MyProps) => {
-	return () => <pre>
+	return () => (
+		<pre>
 		{JSON.stringify(props, null, 2)}
-	</pre>;
+		</pre>
+	);
 });

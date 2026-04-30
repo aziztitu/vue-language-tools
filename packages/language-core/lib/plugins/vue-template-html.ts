@@ -2,24 +2,25 @@ import type * as CompilerDOM from '@vue/compiler-dom';
 import type { VueLanguagePlugin } from '../types';
 
 interface Loc {
-	start: { offset: number; };
-	end: { offset: number; };
+	start: { offset: number };
+	end: { offset: number };
 	source: string;
 }
-type Node = CompilerDOM.RootNode | CompilerDOM.TemplateChildNode | CompilerDOM.ExpressionNode | CompilerDOM.AttributeNode | CompilerDOM.DirectiveNode;
+type Node =
+	| CompilerDOM.RootNode
+	| CompilerDOM.TemplateChildNode
+	| CompilerDOM.ExpressionNode
+	| CompilerDOM.AttributeNode
+	| CompilerDOM.DirectiveNode;
 
 const shouldAddSuffix = /(?<=<[^>/]+)$/;
 
 const plugin: VueLanguagePlugin = ({ modules }) => {
-
 	return {
-
-		version: 2.1,
+		version: 2.2,
 
 		compileSFCTemplate(lang, template, options) {
-
 			if (lang === 'html' || lang === 'md') {
-
 				const compiler = modules['@vue/compiler-dom'];
 
 				let addedSuffix = false;
@@ -60,20 +61,18 @@ const plugin: VueLanguagePlugin = ({ modules }) => {
 
 			if (tryUpdateNode(oldResult.ast) && hitNodes.length) {
 				hitNodes = hitNodes.sort((a, b) => a.loc.source.length - b.loc.source.length);
-				const hitNode = hitNodes[0];
+				const hitNode = hitNodes[0]!;
 				if (hitNode.type === CompilerDOM.NodeTypes.SIMPLE_EXPRESSION) {
 					return oldResult;
 				}
 			}
 
 			function tryUpdateNode(node: Node) {
-
 				if (withinChangeRange(node.loc)) {
 					hitNodes.push(node);
 				}
 
 				if (tryUpdateNodeLoc(node.loc)) {
-
 					if (node.type === CompilerDOM.NodeTypes.ROOT) {
 						for (const child of node.children) {
 							if (!tryUpdateNode(child)) {
@@ -147,12 +146,14 @@ const plugin: VueLanguagePlugin = ({ modules }) => {
 						}
 					}
 					else if (node.type === CompilerDOM.NodeTypes.FOR) {
-						for (const child of [
-							node.parseResult.source,
-							node.parseResult.value,
-							node.parseResult.key,
-							node.parseResult.index,
-						]) {
+						for (
+							const child of [
+								node.parseResult.source,
+								node.parseResult.value,
+								node.parseResult.key,
+								node.parseResult.index,
+							]
+						) {
 							if (child) {
 								if (!tryUpdateNode(child)) {
 									return false;
@@ -197,12 +198,10 @@ const plugin: VueLanguagePlugin = ({ modules }) => {
 				return false;
 			}
 			function tryUpdateNodeLoc(loc: Loc) {
-
 				delete (loc as any).__endOffset;
 
 				if (withinChangeRange(loc)) {
-					loc.source =
-						loc.source.slice(0, change.start - loc.start.offset)
+					loc.source = loc.source.slice(0, change.start - loc.start.offset)
 						+ change.newText
 						+ loc.source.slice(change.end - loc.start.offset);
 					(loc as any).__endOffset = loc.end.offset;
