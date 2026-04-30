@@ -3,6 +3,9 @@
   "name": "@azee/vue-language-plugin-pug",
   "version": "2.3.17",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "files": [
     "**/*.js",
     "**/*.d.ts"
