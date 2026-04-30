@@ -1,7 +1,7 @@
 {
   "private": false,
   "name": "@azee/vue-language-core",
-  "version": "2.3.16",
+  "version": "2.3.17",
   "license": "MIT",
   "files": [
     "**/*.js",

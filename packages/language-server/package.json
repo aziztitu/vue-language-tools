@@ -1,7 +1,7 @@
 {
   "private": false,
   "name": "@azee/vue-language-server",
-  "version": "2.3.16",
+  "version": "2.3.17",
   "license": "MIT",
   "files": [
     "**/*.js",
@@ -17,9 +17,9 @@
     "directory": "packages/language-server"
   },
   "dependencies": {
-    "@azee/vue-language-core": "^2.3.16",
-    "@azee/vue-language-service": "^2.3.16",
-    "@azee/vue-typescript-plugin": "^2.3.16",
+    "@azee/vue-language-core": "^2.3.17",
+    "@azee/vue-language-service": "^2.3.17",
+    "@azee/vue-typescript-plugin": "^2.3.17",
     "@volar/language-core": "2.4.11",
     "@volar/language-server": "2.4.11",
     "@volar/test-utils": "2.4.11",

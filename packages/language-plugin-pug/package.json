@@ -1,7 +1,7 @@
 {
   "private": false,
   "name": "@azee/vue-language-plugin-pug",
-  "version": "2.3.16",
+  "version": "2.3.17",
   "license": "MIT",
   "files": [
     "**/*.js",
@@ -14,7 +14,7 @@
     "directory": "packages/language-plugin-pug"
   },
   "devDependencies": {
-    "@azee/vue-language-core": "^2.3.16",
+    "@azee/vue-language-core": "^2.3.17",
     "@types/node": "^22.10.4"
   },
   "dependencies": {
