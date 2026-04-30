@@ -1,6 +1,6 @@
 {
 	"name": "@azee/vue-language-plugin-pug",
-	"version": "3.0.8",
+	"version": "3.0.9",
 	"license": "MIT",
 	"files": [
 		"**/*.js",
@@ -17,8 +17,8 @@
 		"volar-service-pug": "0.0.65"
 	},
 	"devDependencies": {
+		"@azee/vue-language-core": "3.0.9",
 		"@types/node": "^22.10.4",
-		"@vue/compiler-dom": "^3.5.0",
-		"@azee/vue-language-core": "3.0.8"
+		"@vue/compiler-dom": "^3.5.0"
 	}
 }

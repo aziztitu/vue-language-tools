@@ -1,6 +1,6 @@
 {
 	"name": "@azee/vue-typescript-plugin",
-	"version": "3.0.8",
+	"version": "3.0.9",
 	"license": "MIT",
 	"files": [
 		"**/*.js",
@@ -13,8 +13,8 @@
 		"directory": "packages/typescript-plugin"
 	},
 	"dependencies": {
+		"@azee/vue-language-core": "3.0.9",
 		"@volar/typescript": "2.4.23",
-		"@azee/vue-language-core": "3.0.8",
 		"@vue/shared": "^3.5.0",
 		"laplacenoma": "^0.0.3",
 		"path-browserify": "^1.0.1"

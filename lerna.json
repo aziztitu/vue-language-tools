@@ -1,18 +1,18 @@
 {
-	"$schema": "https://raw.githubusercontent.com/lerna-lite/lerna-lite/main/packages/cli/schemas/lerna-schema.json",
-	"command": {
-		"version": {
-			"syncWorkspaceLock": true
-		}
-	},
-	"exact": true,
-	"forcePublish": true,
-	"npmClient": "pnpm",
-	"packages": [
-		"extensions/**",
-		"packages/**",
-		"test-workspace"
-	],
-	"version": "3.0.8",
-	"yes": true
+  "$schema": "https://raw.githubusercontent.com/lerna-lite/lerna-lite/main/packages/cli/schemas/lerna-schema.json",
+  "command": {
+    "version": {
+      "syncWorkspaceLock": true
+    }
+  },
+  "exact": true,
+  "forcePublish": true,
+  "npmClient": "pnpm",
+  "packages": [
+    "extensions/**",
+    "packages/**",
+    "test-workspace"
+  ],
+  "version": "3.0.9",
+  "yes": true
 }

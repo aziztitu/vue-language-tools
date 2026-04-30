@@ -39,10 +39,10 @@ importers:
   extensions/vscode:
     devDependencies:
       '@azee/vue-language-server':
-        specifier: 3.0.8
+        specifier: 3.0.9
         version: link:../../packages/language-server
       '@azee/vue-typescript-plugin':
-        specifier: 3.0.8
+        specifier: 3.0.9
         version: link:../../packages/typescript-plugin
       '@types/node':
         specifier: ^22.10.4
@@ -81,10 +81,10 @@ importers:
   packages/component-meta:
     dependencies:
       '@azee/vue-component-type-helpers':
-        specifier: 3.0.8
+        specifier: 3.0.9
         version: link:../component-type-helpers
       '@azee/vue-language-core':
-        specifier: 3.0.8
+        specifier: 3.0.9
         version: link:../language-core
       '@volar/typescript':
         specifier: 2.4.23
@@ -161,7 +161,7 @@ importers:
         version: 0.0.65
     devDependencies:
       '@azee/vue-language-core':
-        specifier: 3.0.8
+        specifier: 3.0.9
         version: link:../language-core
       '@types/node':
         specifier: ^22.10.4
@@ -173,13 +173,13 @@ importers:
   packages/language-server:
     dependencies:
       '@azee/vue-language-core':
-        specifier: 3.0.8
+        specifier: 3.0.9
         version: link:../language-core
       '@azee/vue-language-service':
-        specifier: 3.0.8
+        specifier: 3.0.9
         version: link:../language-service
       '@azee/vue-typescript-plugin':
-        specifier: 3.0.8
+        specifier: 3.0.9
         version: link:../typescript-plugin
       '@volar/language-server':
         specifier: 2.4.23
@@ -201,7 +201,7 @@ importers:
   packages/language-service:
     dependencies:
       '@azee/vue-language-core':
-        specifier: 3.0.8
+        specifier: 3.0.9
         version: link:../language-core
       '@volar/language-service':
         specifier: 2.4.23
@@ -241,7 +241,7 @@ importers:
         version: 3.0.8
     devDependencies:
       '@azee/vue-typescript-plugin':
-        specifier: 3.0.8
+        specifier: 3.0.9
         version: link:../typescript-plugin
       '@types/node':
         specifier: ^22.10.4
@@ -265,7 +265,7 @@ importers:
   packages/tsc:
     dependencies:
       '@azee/vue-language-core':
-        specifier: 3.0.8
+        specifier: 3.0.9
         version: link:../language-core
       '@volar/typescript':
         specifier: 2.4.23
@@ -281,7 +281,7 @@ importers:
   packages/typescript-plugin:
     dependencies:
       '@azee/vue-language-core':
-        specifier: 3.0.8
+        specifier: 3.0.9
         version: link:../language-core
       '@volar/typescript':
         specifier: 2.4.23
@@ -306,7 +306,7 @@ importers:
   test-workspace:
     devDependencies:
       '@azee/vue-component-meta':
-        specifier: 3.0.8
+        specifier: 3.0.9
         version: link:../packages/component-meta
       typescript:
         specifier: ^5.7.2
